@@ -1,0 +1,15 @@
+#
+# This file should only contain non OS, editor specific settings as those depend on personal
+# preferences and should be set in your global personal ignore file (usually created in ones
+# home directory).
+# Working on OSX and using pyCharm and emacs a global .gitignore likely includes:
+# *~
+# .DS_Store
+# .idea
+#
+# On OSX/Linux: git config --global core.excludesfile ~/.gitignore
+# On Windows: git config --global core.excludesfile %USERPROFILE%\.gitignore
+#
+**/__pycache__
+dist/
+

@@ -1,0 +1,6 @@
+name: ibex_knowledge_base_utilities
+
+channels:
+  - defaults
+dependencies:
+  - python=3.10.0 
