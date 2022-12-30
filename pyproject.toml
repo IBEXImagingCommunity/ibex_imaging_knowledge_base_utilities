@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0", 
+            "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ibex_imaging_knowledge_base_utilities"
+version = "0.1.0"
+authors = [{ name="Ziv Yaniv", email="zivyaniv@nih.gov" },
+]
+description = "Utility scripts used for maintaining the IBEX Imaging Community Knowledge-Base"
+readme = "README.md"
+requires-python = ">=3.10.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache 2.0",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pandas",
+    "tabulate",
+    "bibtexparser",
+    "requests"
+]
+
+[project.urls]
+"Bug Tracker" = "https://github.com/IBEXImagingCommunity/ibex_imaging_knowledge_base_utilities/issues"
+
+[project.scripts]
+bib2md = "ibex_imaging_knowledge_base_utilities.bib2md:main"
+reagent_resources_csv_2_md_url = "ibex_imaging_knowledge_base_utilities.reagent_resources_csv_2_md_url:main"
+update_index_md_stats = "ibex_imaging_knowledge_base_utilities.update_index_md_stats:main"
