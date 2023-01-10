@@ -21,6 +21,9 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+### Added
+* validate_zenodo_json - script for validating the .zenodo.json file. Ensure that complies with our project specific requirements.
+
 ## v0.1.0
 
 ### Added

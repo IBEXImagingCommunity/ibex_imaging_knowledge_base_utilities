@@ -1,0 +1,33 @@
+{
+    "description": "This repository contains the current state of knowledge with respect to antibody usage as part of the IBEX imaging protocol.",
+
+    "keywords": [
+        "Multiplexed Optical Imaging",
+        "Antibody"
+    ],
+    "license": {
+        "id": "cc-by-4.0"
+    },
+    "title": "Iterative Bleaching Extends Multiplexity (IBEX) Antibody KnowledgeBase",
+    "upload_type": "dataset",
+    "creators": [
+        {
+            "affiliation": "National Institutes of Health",
+            "name": "Yaniv, Ziv",
+            "email": "zivyaniv@nih.gov"
+        },
+        {
+            "affiliation": "National Institutes of Health",
+            "name": "Germain, Ronald",
+            "orcid": "0000-0003-1495-9143",
+            "email": "rgermain@niaid.nih.gov"
+        },
+        {
+            "affiliation": "National Institutes of Health",
+            "name": "Radtke, Andrea J.",
+            "orcid": "0000-0003-4379-8967",
+            "email": "andrea.radtke@nih.gov"
+        }
+    ],
+    "grants": [{"id":"10.13039/100000002::1ZIAAI000974-07"}]
+}

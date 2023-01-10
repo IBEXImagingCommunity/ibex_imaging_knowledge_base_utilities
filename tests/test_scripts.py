@@ -9,6 +9,9 @@ from ibex_imaging_knowledge_base_utilities.bib2md import bibfile2md
 from ibex_imaging_knowledge_base_utilities.update_index_md_stats import (
     update_index_stats,
 )
+from ibex_imaging_knowledge_base_utilities.validate_zenodo_json import (
+    validate_zenodo_json,
+)
 
 
 class BaseTest:
@@ -91,3 +94,16 @@ class TestUpdateIndexMDStats(BaseTest):
             output_file_path,
         )
         assert self.files_md5([output_file_path]) == result_md5hash
+
+
+class TestZenodoJsonValidataion(BaseTest):
+    @pytest.mark.parametrize(
+        "zenodo_json_file_name, result",
+        [
+            ("zenodo.json", 0),
+            ("zenodo_duplicate_contributor.json", 1),
+            ("zenodo_missing_orcid.json", 1),
+        ],
+    )
+    def test_validate_zenodo_json(self, zenodo_json_file_name, result):
+        assert validate_zenodo_json(self.data_path / zenodo_json_file_name) == result
