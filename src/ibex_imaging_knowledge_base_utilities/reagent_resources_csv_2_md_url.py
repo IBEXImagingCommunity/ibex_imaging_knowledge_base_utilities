@@ -112,12 +112,14 @@ def data_to_md_str(data, supporting_material_root_dir):
         urls_str = ""
         txt = [v.strip() for v in data[0].split(";") if v.strip() != ""]
         for v in txt[0:-1]:
-            urls_str += (
-                f"[{v}]({supporting_material_root_dir}/{data[1]}_{data[2]}/{v}.md), "
-            )
-        urls_str += f"[{txt[-1]}]({supporting_material_root_dir}/{data[1]}_{data[2]}/{txt[-1]}.md)"
-        # Encode space as %20 in the url
-        urls_str = urls_str.replace(" ", "%20")
+            # Replace all spaces and slashes with underscores so that the path
+            # matches the expected supporting material path
+            tc_subpath = f"{data[1]}_{data[2]}".replace(" ", "_").replace("/", "_")
+            urls_str += f"[{v}]({supporting_material_root_dir}/{tc_subpath}/{v}.md), "
+        tc_subpath = f"{data[1]}_{data[2]}".replace(" ", "_").replace("/", "_")
+        urls_str += (
+            f"[{txt[-1]}]({supporting_material_root_dir}/{tc_subpath}/{txt[-1]}.md)"
+        )
     return urls_str
 
 
@@ -202,10 +204,15 @@ def csv_to_md_with_url(
         print("Finished linking to UniProt...")
         print("Start linking to vendor websites...")
         vendor_to_website = json_to_md_str_dict(vendor_to_website_json_file_path)
-        df["Vendor"] = df["Vendor"].apply(lambda x: vendor_to_website[x])
+        try:
+            df["Vendor"] = df["Vendor"].apply(lambda x: vendor_to_website[x])
+        except KeyError as k:
+            print(f"Vendor ({k}) not found in {vendor_to_website_json_file_path}.")
+            return 1
         print("Finished linking to vendor websites...")
     with open(supporting_material_root_dir.parent / "reagent_resources.md", "w") as fp:
         fp.write("# Reagent Resources\n\n" + md_header + df.to_markdown(index=False))
+    return 0
 
 
 def main(argv=None):
@@ -237,7 +244,7 @@ def main(argv=None):
     try:
         if args.skip_url_validation:
             requests.get = short_circuit_requests_get
-        csv_to_md_with_url(
+        return csv_to_md_with_url(
             args.csv_file, args.supporting_material_root_dir, args.vendor_to_website
         )
     except Exception as e:
