@@ -21,8 +21,13 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v0.2.0
+
 ### Added
 * validate_zenodo_json - script for validating the .zenodo.json file. Ensure that complies with our project specific requirements.
+
+### Changed
+* reagent_resources_csv_2_md_url - replace usage of spaces and slashs in paths with underscores, to match the structure of the `supporting_material` directory.
 
 ## v0.1.0
 
