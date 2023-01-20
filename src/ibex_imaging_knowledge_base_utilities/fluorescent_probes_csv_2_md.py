@@ -19,9 +19,8 @@
 import pandas as pd
 import argparse
 import sys
-import pathlib
-from .argparse_types import file_path
-import json
+from .argparse_types import file_path, dir_path
+
 
 """
 This script converts the IBEX knowledge-base fluorescent_probes.csv file to markdown.
@@ -29,15 +28,12 @@ This script converts the IBEX knowledge-base fluorescent_probes.csv file to mark
 This script is automatically run when modifications to the fluorescent_probes.csv file is merged
 into the main branch of the ibex_knowledge_base repository (see .github/workflows/data2md.yml).
 
-Assumption: The fluorescent_probes.csv file is valid. It conforms to the expected format (empty entries denoted 
+Assumption: The fluorescent_probes.csv file is valid. It conforms to the expected format (empty entries denoted
 by the string "NA").
 """
 
-def fluorescent_probe_csv_to_md(
-    template_file_path,
-    csv_file_path,
-    output_dir
-):
+
+def fluorescent_probe_csv_to_md(template_file_path, csv_file_path, output_dir):
     """
     Convert the IBEX knowledge-base fluorescent probe csv file to markdown. Output is written to a
     file named fluorescent_probes.md in the output directory. The template_file_path file is expected
@@ -50,16 +46,14 @@ def fluorescent_probe_csv_to_md(
     with open(template_file_path, "r") as fp:
         input_md_str = fp.read()
     with open(output_dir / "fluorescent_probes.md", "w") as fp:
-        fp.write(
-            input_md_str.format(probe_table=df.to_markdown(index=False))
-        )
+        fp.write(input_md_str.format(probe_table=df.to_markdown(index=False)))
 
 
 def main(argv=None):
     if argv is None:  # script was invoked from commandline
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
-        description="Convert knowledge-base fluorescent probes file from csv to md and sort according to excitation and emission."
+        description="Convert knowledge-base fluorescent probes file from csv to md and sort according to excitation and emission."  # noqa E501
     )
     parser.add_argument(
         "md_template_file",
@@ -80,7 +74,7 @@ def main(argv=None):
         return fluorescent_probe_csv_to_md(
             template_file_path=args.md_template_file,
             csv_file_path=args.csv_file,
-            output_dir=args.output_dir
+            output_dir=args.output_dir,
         )
     except Exception as e:
         print(

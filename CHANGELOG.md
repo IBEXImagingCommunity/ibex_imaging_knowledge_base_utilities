@@ -21,6 +21,19 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v0.3.0
+
+### Added
+* fluorescent_probes_csv_2_md - script for creating the knowledge-base fluorescent_probes markdown page from the fluorescent_probes.csv.
+
+### Changed
+* reagent_resources_csv_2_md_url - In addition to the reagent_resources.csv we now use a template file into which the table is written. Allows us to modify the descriptive text without modifying code. Additionally, the table is sorted on the "Target Name / Protein Biomarker" column.
+* update_index_md_stats - Change the computed statistics to:
+  1. number_of_contributors - count both original contributors and folks that replicated the work.
+  1. number_of_validated_reagents - count rows in the reagent_resources.csv.
+  1. number_of_fluorescent_probes - count number of unique entries in conjugate column of the reagent_resources.csv (ignoring NA, Unconjugated, Biotin, HRP, UT014, UT015, UT016, UT019).
+  1. number_of_tissues - count unique combinations of Target_Species-Target_Tissue-Tissue_State.
+
 ## v0.2.0
 
 ### Added

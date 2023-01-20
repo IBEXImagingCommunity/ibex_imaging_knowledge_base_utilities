@@ -5,7 +5,9 @@ import hashlib
 from ibex_imaging_knowledge_base_utilities.reagent_resources_csv_2_md_url import (
     csv_to_md_with_url,
 )
-from ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md import fluorescent_probe_csv_to_md
+from ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md import (
+    fluorescent_probe_csv_to_md,
+)
 
 from ibex_imaging_knowledge_base_utilities.bib2md import bibfile2md
 from ibex_imaging_knowledge_base_utilities.update_index_md_stats import (
@@ -35,7 +37,7 @@ class BaseTest:
 
 class TestCSV2MD(BaseTest):
     @pytest.mark.parametrize(
-        "md_template_file_name, csv_file_name, supporting_material_root_dir, vendor_to_website_json_file_path, result_md5hash",
+        "md_template_file_name, csv_file_name, supporting_material_root_dir, vendor_to_website_json_file_path, result_md5hash",  # noqa E501
         [
             (
                 "reagent_resources.md.in",
@@ -66,6 +68,7 @@ class TestCSV2MD(BaseTest):
             == result_md5hash
         )
 
+
 class TestFluorescentProbesCSV2MD(BaseTest):
     @pytest.mark.parametrize(
         "md_template_file_name, csv_file_name, result_md5hash",
@@ -78,21 +81,15 @@ class TestFluorescentProbesCSV2MD(BaseTest):
         ],
     )
     def test_fluorescent_probe_csv_to_md(
-        self,
-        md_template_file_name,
-        csv_file_name,
-        result_md5hash,
-        tmp_path
+        self, md_template_file_name, csv_file_name, result_md5hash, tmp_path
     ):
         fluorescent_probe_csv_to_md(
-            template_file_path = self.data_path / md_template_file_name,
-            csv_file_path = self.data_path / csv_file_name,
-            output_dir = tmp_path
+            template_file_path=self.data_path / md_template_file_name,
+            csv_file_path=self.data_path / csv_file_name,
+            output_dir=tmp_path,
         )
-        assert (
-            self.files_md5([tmp_path / "fluorescent_probes.md"])
-            == result_md5hash
-        )
+        assert self.files_md5([tmp_path / "fluorescent_probes.md"]) == result_md5hash
+
 
 class TestBib2MD(BaseTest):
     @pytest.mark.parametrize(
