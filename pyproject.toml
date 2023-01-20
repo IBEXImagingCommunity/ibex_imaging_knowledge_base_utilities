@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ibex_imaging_knowledge_base_utilities"
-version = "0.2.0"
+version = "0.3.0"
 authors = [{ name="Ziv Yaniv", email="zivyaniv@nih.gov" },
 ]
 description = "Utility scripts used for maintaining the IBEX Imaging Community Knowledge-Base"
@@ -30,5 +30,6 @@ dependencies = [
 [project.scripts]
 bib2md = "ibex_imaging_knowledge_base_utilities.bib2md:main"
 reagent_resources_csv_2_md_url = "ibex_imaging_knowledge_base_utilities.reagent_resources_csv_2_md_url:main"
+fluorescent_probes_csv_2_md = "ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md:main"
 update_index_md_stats = "ibex_imaging_knowledge_base_utilities.update_index_md_stats:main"
 validate_zenodo_json = "ibex_imaging_knowledge_base_utilities.validate_zenodo_json:main"
