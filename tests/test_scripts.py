@@ -5,6 +5,8 @@ import hashlib
 from ibex_imaging_knowledge_base_utilities.reagent_resources_csv_2_md_url import (
     csv_to_md_with_url,
 )
+from ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md import fluorescent_probe_csv_to_md
+
 from ibex_imaging_knowledge_base_utilities.bib2md import bibfile2md
 from ibex_imaging_knowledge_base_utilities.update_index_md_stats import (
     update_index_stats,
@@ -33,18 +35,20 @@ class BaseTest:
 
 class TestCSV2MD(BaseTest):
     @pytest.mark.parametrize(
-        "csv_file_name, supporting_material_root_dir, vendor_to_website_json_file_path, result_md5hash",
+        "md_template_file_name, csv_file_name, supporting_material_root_dir, vendor_to_website_json_file_path, result_md5hash",
         [
             (
+                "reagent_resources.md.in",
                 "reagent_resources.csv",
                 "supporting_material",
                 "vendor_urls.json",
-                "4a918d9274950a9ce091310cdb2903c2",
+                "eaaff9000872870cfd0712ecc372f622",
             )
         ],
     )
     def test_csv_2_md_with_url(
         self,
+        md_template_file_name,
         csv_file_name,
         supporting_material_root_dir,
         vendor_to_website_json_file_path,
@@ -52,6 +56,7 @@ class TestCSV2MD(BaseTest):
     ):
 
         csv_to_md_with_url(
+            self.data_path / md_template_file_name,
             self.data_path / csv_file_name,
             self.data_path / supporting_material_root_dir,
             self.data_path / vendor_to_website_json_file_path,
@@ -61,6 +66,33 @@ class TestCSV2MD(BaseTest):
             == result_md5hash
         )
 
+class TestFluorescentProbesCSV2MD(BaseTest):
+    @pytest.mark.parametrize(
+        "md_template_file_name, csv_file_name, result_md5hash",
+        [
+            (
+                "fluorescent_probes.md.in",
+                "fluorescent_probes.csv",
+                "5a1133df3230beb235bc3e4eda324d90",
+            )
+        ],
+    )
+    def test_fluorescent_probe_csv_to_md(
+        self,
+        md_template_file_name,
+        csv_file_name,
+        result_md5hash,
+        tmp_path
+    ):
+        fluorescent_probe_csv_to_md(
+            template_file_path = self.data_path / md_template_file_name,
+            csv_file_path = self.data_path / csv_file_name,
+            output_dir = tmp_path
+        )
+        assert (
+            self.files_md5([tmp_path / "fluorescent_probes.md"])
+            == result_md5hash
+        )
 
 class TestBib2MD(BaseTest):
     @pytest.mark.parametrize(
@@ -81,7 +113,7 @@ class TestBib2MD(BaseTest):
 class TestUpdateIndexMDStats(BaseTest):
     @pytest.mark.parametrize(
         "input_md_file_name, csv_file_name, result_md5hash",
-        [("index.md.in", "reagent_resources.csv", "4bb071331c7fe7945e0759e9c95bbd12")],
+        [("index.md.in", "reagent_resources.csv", "776c99aec2968209d2e351e63e6b325a")],
     )
     def test_update_index_stats(
         self, input_md_file_name, csv_file_name, result_md5hash, tmp_path
