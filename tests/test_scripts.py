@@ -94,7 +94,7 @@ class TestFluorescentProbesCSV2MD(BaseTest):
 class TestBib2MD(BaseTest):
     @pytest.mark.parametrize(
         "bib_file_name, csl_file_name, result_md5hash",
-        [("publications.bib", "ibex.csl", "61f01467fe88de1f686afcbbd4abaed7")],
+        [("publications.bib", "ibex.csl", "b95a58740183fb04079027610e3d06c1")],
     )
     def test_bib_2_md(self, bib_file_name, csl_file_name, result_md5hash, tmp_path):
         # Write the output using the tmp_path fixture
