@@ -15,11 +15,17 @@ Each release should describe the changes using the following subsection types:
 When working on the package, add information under the "Unreleased" heading. In this manner the release notes are
 created incrementally, and do not require a concerted effort prior to a release.
 
-Using a manual approach to create the release notes instead of automatically deriving them from the 
+Using a manual approach to create the release notes instead of automatically deriving them from the
 commits allows us to provide a high level description of the features and issues, yet provide details when those are
 needed. This is equivalent to summarizing all activity on a feature branch versus reporting all commits on that branch.
 
 ## Unreleased
+
+## v0.3.2
+
+### Changed
+* reagent_resources_csv_2_md_url - Update the automatic path to supporting material creation. The paths cannot include parentheses, so thos are replaced with underscores. Additionally, the insertion of the table into the input markdown file is done via the string `replace` and not the `format` method because the use of `format` precludes the presence of curly braces in the template file. We now need to use curly braces in the input markdown file so that the table has an id value when the markdown is converted to html.
+
 
 ## v0.3.0
 

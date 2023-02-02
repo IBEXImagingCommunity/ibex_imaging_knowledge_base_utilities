@@ -20,7 +20,7 @@ import pandas as pd
 import argparse
 import sys
 import pathlib
-from .argparse_types import file_path, dir_path
+from .argparse_types import file_path, file_path_endswith_md_in, dir_path
 import requests
 import json
 from itertools import chain
@@ -71,9 +71,9 @@ request_headers = {
 
 def json_to_md_str_dict(json_file_path):
     with open(json_file_path) as fp:
-        json_dict = json.load(fp)
+        data_dict = json.load(fp)
     md_str_dict = {}
-    for raw_text, url_target in json_dict.items():
+    for raw_text, url_target in data_dict.items():
         try:
             res = requests.get(
                 url_target,
@@ -95,6 +95,13 @@ def json_to_md_str_dict(json_file_path):
     return md_str_dict
 
 
+def replace_char_list(input_str, change_chars_list, replacement_char):
+    for c in change_chars_list:
+        if c in input_str:
+            input_str = input_str.replace(c, replacement_char)
+    return input_str
+
+
 def data_to_md_str(data, supporting_material_root_dir):
     """
     The data parameter is a series with three entries:
@@ -110,11 +117,19 @@ def data_to_md_str(data, supporting_material_root_dir):
         urls_str = ""
         txt = [v.strip() for v in data[0].split(";") if v.strip() != ""]
         for v in txt[0:-1]:
-            # Replace all spaces and slashes with underscores so that the path
-            # matches the expected supporting material path
-            tc_subpath = f"{data[1]}_{data[2]}".replace(" ", "_").replace("/", "_")
+            # Replace spaces, slashes and brackets with underscores assume that the
+            # file exists, data validation happens prior to conversion of data to markdown.
+            tc_subpath = replace_char_list(
+                input_str=f"{data[1]}_{data[2]}",
+                change_chars_list=[" ", "\t", "/", "\\", "{", "}", "[", "]", "(", ")"],
+                replacement_char="_",
+            )
             urls_str += f"[{v}]({supporting_material_root_dir}/{tc_subpath}/{v}.md), "
-        tc_subpath = f"{data[1]}_{data[2]}".replace(" ", "_").replace("/", "_")
+        tc_subpath = replace_char_list(
+            input_str=f"{data[1]}_{data[2]}",
+            change_chars_list=[" ", "\t", "/", "\\", "{", "}", "[", "]", "(", ")"],
+            replacement_char="_",
+        )
         urls_str += (
             f"[{txt[-1]}]({supporting_material_root_dir}/{tc_subpath}/{txt[-1]}.md)"
         )
@@ -172,7 +187,12 @@ def csv_to_md_with_url(
     """
     # Read the dataframe and keep entries that are "NA", don't convert to nan
     df = pd.read_csv(csv_file_path, dtype=str, keep_default_na=False)
-    df.sort_values(by=["Target Name / Protein Biomarker"], inplace=True)
+    # Sort dataframe according to target, ignoring case.
+    df.sort_values(
+        by=["Target Name / Protein Biomarker"],
+        inplace=True,
+        key=lambda x: x.str.lower(),
+    )
     supporting_material_path = pathlib.PurePath(supporting_material_root_dir).name
     if not df.empty:
         print("Start linking to supporting material...")
@@ -216,9 +236,11 @@ def csv_to_md_with_url(
 
     with open(template_file_path, "r") as fp:
         input_md_str = fp.read()
-    with open(supporting_material_root_dir.parent / "reagent_resources.md", "w") as fp:
+    with open(supporting_material_root_dir.parent / template_file_path.stem, "w") as fp:
         fp.write(
-            input_md_str.format(reagent_resources_table=df.to_markdown(index=False))
+            input_md_str.replace(
+                "{reagent_resources_table}", df.to_markdown(index=False)
+            )
         )
     return 0
 
@@ -231,7 +253,7 @@ def main(argv=None):
     )
     parser.add_argument(
         "md_template_file",
-        type=file_path,
+        type=file_path_endswith_md_in,
         help='Path to template markdown file which contains the string "{reagent_resources_table}".',
     )
     parser.add_argument(
