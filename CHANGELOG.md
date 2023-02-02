@@ -24,8 +24,7 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 ## v0.3.2
 
 ### Changed
-* reagent_resources_csv_2_md_url - Update the automatic path to supporting material creation. The paths cannot include parentheses, so thos are replaced with underscores. Additionally, the insertion of the table into the input markdown file is done via the string `replace` and not the `format` method because the use of `format` precludes the presence of curly braces in the template file. We now need to use curly braces in the input markdown file so that the table has an id value when the markdown is converted to html.
-
+* reagent_resources_csv_2_md_url - Update the automatic path to supporting material creation. The paths cannot include parentheses, so those are replaced with underscores. Additionally, the insertion of the table into the input markdown file is done via the string `replace` and not the `format` method because the use of `format` precludes the presence of curly braces in the template file. We now need to use curly braces in the input markdown file so that the table has an id value when the markdown is converted to html.
 
 ## v0.3.0
 
