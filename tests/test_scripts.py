@@ -116,13 +116,13 @@ class TestUpdateIndexMDStats(BaseTest):
         self, input_md_file_name, csv_file_name, result_md5hash, tmp_path
     ):
         # Write the output using the tmp_path fixture
-        output_file_path = tmp_path / input_md_file_name
+        output_dir = tmp_path
         update_index_stats(
             self.data_path / input_md_file_name,
             self.data_path / csv_file_name,
-            output_file_path,
+            output_dir,
         )
-        assert self.files_md5([output_file_path]) == result_md5hash
+        assert self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem]) == result_md5hash
 
 
 class TestZenodoJsonValidataion(BaseTest):
