@@ -43,7 +43,7 @@ class TestCSV2MD(BaseTest):
                 "reagent_resources.md.in",
                 "reagent_resources.csv",
                 "supporting_material",
-                "vendor_urls.json",
+                "vendors_and_urls.csv",
                 "eaaff9000872870cfd0712ecc372f622",
             )
         ],
@@ -53,7 +53,7 @@ class TestCSV2MD(BaseTest):
         md_template_file_name,
         csv_file_name,
         supporting_material_root_dir,
-        vendor_to_website_json_file_path,
+        vendor_to_website_csv_file_path,
         result_md5hash,
     ):
 
@@ -61,7 +61,7 @@ class TestCSV2MD(BaseTest):
             self.data_path / md_template_file_name,
             self.data_path / csv_file_name,
             self.data_path / supporting_material_root_dir,
-            self.data_path / vendor_to_website_json_file_path,
+            self.data_path / vendor_to_website_csv_file_path,
         )
         assert (
             self.files_md5([(self.data_path / csv_file_name).with_suffix(".md")])
