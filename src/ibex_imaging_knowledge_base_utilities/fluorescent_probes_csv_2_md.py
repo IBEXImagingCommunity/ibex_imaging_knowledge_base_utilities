@@ -19,7 +19,7 @@
 import pandas as pd
 import argparse
 import sys
-from .argparse_types import file_path, dir_path
+from .argparse_types import file_path, file_path_endswith_md_in, dir_path
 
 
 """
@@ -45,8 +45,9 @@ def fluorescent_probe_csv_to_md(template_file_path, csv_file_path, output_dir):
     df.sort_values(by=["Excitation Max (nm)", "Emission Max (nm)"], inplace=True)
     with open(template_file_path, "r") as fp:
         input_md_str = fp.read()
-    with open(output_dir / "fluorescent_probes.md", "w") as fp:
-        fp.write(input_md_str.format(probe_table=df.to_markdown(index=False)))
+    with open(output_dir / template_file_path.stem, "w") as fp:
+        fp.write(input_md_str.format(probe_table=df.to_markdown(index=False,colalign=["left"]*len(df.columns))))
+
 
 
 def main(argv=None):
@@ -57,7 +58,7 @@ def main(argv=None):
     )
     parser.add_argument(
         "md_template_file",
-        type=file_path,
+        type=file_path_endswith_md_in,
         help='Path to template markdown file which contains the string "{probe_table}".',
     )
     parser.add_argument(

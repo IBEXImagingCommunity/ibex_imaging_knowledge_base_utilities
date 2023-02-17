@@ -76,19 +76,20 @@ class TestFluorescentProbesCSV2MD(BaseTest):
             (
                 "fluorescent_probes.md.in",
                 "fluorescent_probes.csv",
-                "5a1133df3230beb235bc3e4eda324d90",
+                "a4d6cf59f826e9a8c8b6be49dcfbe5e5",
             )
         ],
     )
     def test_fluorescent_probe_csv_to_md(
         self, md_template_file_name, csv_file_name, result_md5hash, tmp_path
     ):
+        output_dir = tmp_path
         fluorescent_probe_csv_to_md(
             template_file_path=self.data_path / md_template_file_name,
             csv_file_path=self.data_path / csv_file_name,
             output_dir=tmp_path,
         )
-        assert self.files_md5([tmp_path / "fluorescent_probes.md"]) == result_md5hash
+        assert self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem]) == result_md5hash
 
 
 class TestBib2MD(BaseTest):
