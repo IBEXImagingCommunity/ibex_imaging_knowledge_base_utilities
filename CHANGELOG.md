@@ -21,6 +21,8 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v0.4.0
+
 ### Added
 * zenodo_json_2_thewho_md - Explicitly list all of the contributors to the knowledge base. The list is extracted from the .zenodo.json file and inserted into the given markdown template file, ends with `md.in`.
 * datadict_glossary_2_contrib_md - Script which creates the contrib.md file, instructions on how to contribute. The file is created from a template input file, the knowledge base data dictionary and glossary csv files.
