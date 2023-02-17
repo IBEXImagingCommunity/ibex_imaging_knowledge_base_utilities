@@ -137,3 +137,16 @@ class TestZenodoJsonValidataion(BaseTest):
     )
     def test_validate_zenodo_json(self, zenodo_json_file_name, result):
         assert validate_zenodo_json(self.data_path / zenodo_json_file_name) == result
+
+
+class ZenodoJson2Contrib(BaseTest):
+    @pytest.mark.parametrize(
+        "input_md_file_name, zenodo_json_file_name, result_md5hash",
+        [
+            ("the_who.md.in", "zenodo.json", "cfc7c78033d0b88bfffde28c8b684f37"),
+        ],
+    )
+    def test_zenodo_creators_to_md(self, input_md_file_name, zenodo_json_file_name, result_md5hash, tmp_path):
+        output_dir = tmp_path
+        zenodo_creators_to_md(self.data / input_md_file_name, self.data_path / zenodo_json_file_name, output_dir)
+        assert self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem]) == result_md5hash

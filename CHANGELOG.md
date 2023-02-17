@@ -21,6 +21,9 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+### Added
+* zenodo_json_2_thewho_md - Explicitly list all of the contributors to the knowledge base. The list is extracted from the .zenodo.json file and inserted into the given markdown template file, ends with `md.in`.
+
 ### Changed
 * reagent_resources_csv_2_md_url - Use a csv file to map vendor name to URL instead of a JSON file. Treat it as data and not as a program configuration file.
 * update_index_md_stats - Use output directory instead of output file name. File name is derived from input file name which ends with `.md.in`.
