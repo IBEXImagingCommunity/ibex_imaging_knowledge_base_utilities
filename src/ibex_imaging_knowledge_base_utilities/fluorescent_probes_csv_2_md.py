@@ -46,8 +46,13 @@ def fluorescent_probe_csv_to_md(template_file_path, csv_file_path, output_dir):
     with open(template_file_path, "r") as fp:
         input_md_str = fp.read()
     with open(output_dir / template_file_path.stem, "w") as fp:
-        fp.write(input_md_str.format(probe_table=df.to_markdown(index=False,colalign=["left"]*len(df.columns))))
-
+        fp.write(
+            input_md_str.format(
+                probe_table=df.to_markdown(
+                    index=False, colalign=["left"] * len(df.columns)
+                )
+            )
+        )
 
 
 def main(argv=None):

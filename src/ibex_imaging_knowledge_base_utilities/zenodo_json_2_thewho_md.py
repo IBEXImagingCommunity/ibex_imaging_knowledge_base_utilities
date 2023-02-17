@@ -26,7 +26,12 @@ def zenodo_creators_to_md(template_file_path, zenodo_json_file_path, output_dir)
     # Read the json file and get creators list
     with open(zenodo_json_file_path) as fp:
         creators_list = json.load(fp)["creators"]
-    contrib_list_md = '\n'.join([f"1. {cr['name']}, {cr['affiliation']}, [{cr['orcid']}](https://orcid.org/{cr['orcid']})." for cr in creators_list])
+    contrib_list_md = "\n".join(
+        [
+            f"1. {cr['name']}, {cr['affiliation']}, [{cr['orcid']}](https://orcid.org/{cr['orcid']})."
+            for cr in creators_list
+        ]
+    )
     with open(template_file_path, "r") as fp:
         input_md_str = fp.read()
     with open(output_dir / template_file_path.stem, "w") as fp:

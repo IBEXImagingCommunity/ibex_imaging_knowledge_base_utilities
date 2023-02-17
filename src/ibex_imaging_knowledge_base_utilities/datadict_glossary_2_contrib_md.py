@@ -22,15 +22,26 @@ import argparse
 from .argparse_types import file_path, file_path_endswith_md_in, dir_path
 
 
-def dict_glossary_to_md(template_file_path, data_dict_file_path, glossary_file_path, output_dir):
+def dict_glossary_to_md(
+    template_file_path, data_dict_file_path, glossary_file_path, output_dir
+):
     # Read the dataframe and keep entries that are "NA", don't convert to nan
-    dict_df = pd.read_csv(data_dict_file_path, encoding = "ISO-8859-1")
-    glossary_df = pd.read_csv(glossary_file_path, encoding = "ISO-8859-1")
+    dict_df = pd.read_csv(data_dict_file_path, encoding="ISO-8859-1")
+    glossary_df = pd.read_csv(glossary_file_path, encoding="ISO-8859-1")
     with open(template_file_path, "r") as fp:
         input_md_str = fp.read()
     with open(output_dir / template_file_path.stem, "w") as fp:
-        fp.write(input_md_str.format(reagent_metadata_table=dict_df.to_markdown(index=False,colalign=["left"]*len(dict_df.columns)),
-                                     glossary_table=glossary_df.to_markdown(index=False,colalign=["left"]*len(glossary_df.columns))))
+        fp.write(
+            input_md_str.format(
+                reagent_metadata_table=dict_df.to_markdown(
+                    index=False, colalign=["left"] * len(dict_df.columns)
+                ),
+                glossary_table=glossary_df.to_markdown(
+                    index=False, colalign=["left"] * len(glossary_df.columns)
+                ),
+            )
+        )
+
 
 def main(argv=None):
     if argv is None:  # script was invoked from commandline
@@ -41,10 +52,12 @@ def main(argv=None):
     parser.add_argument(
         "md_template_file",
         type=file_path_endswith_md_in,
-        help='Path to template markdown file which contains the strings "{reagent_metadata_table}" and "{glossary_table}".',
+        help='Path to template markdown file which contains the strings "{reagent_metadata_table}" and "{glossary_table}".',  # noqa E501
     )
     parser.add_argument(
-        "data_dictionary", type=file_path, help="Path to the reagent data dictionary csv file."
+        "data_dictionary",
+        type=file_path,
+        help="Path to the reagent data dictionary csv file.",
     )
     parser.add_argument(
         "glossary", type=file_path, help="Path to the glossary csv file."

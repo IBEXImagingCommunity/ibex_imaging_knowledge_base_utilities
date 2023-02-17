@@ -22,7 +22,6 @@ import sys
 import pathlib
 from .argparse_types import file_path, file_path_endswith_md_in, dir_path
 import requests
-import json
 from itertools import chain
 
 """
@@ -230,7 +229,7 @@ def csv_to_md_with_url(
         try:
             df["Vendor"] = df["Vendor"].apply(lambda x: vendor_to_website[x])
         except KeyError as k:
-            print(f"Vendor ({k}) not found in {vendor_to_website_json_file_path}.")
+            print(f"Vendor ({k}) not found in {vendor_to_website_csv_file_path}.")
             return 1
         print("Finished linking to vendor websites...")
 

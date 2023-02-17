@@ -48,7 +48,7 @@ def update_index_stats(md_template_file, input_csv, output_dir):
     stats_dictionary = compute_stats_dictionary(input_csv)
     output_str = input_md_str
     for k, v in stats_dictionary.items():
-        output_str = output_str.replace("{"+k+"}",str(v))
+        output_str = output_str.replace("{" + k + "}", str(v))
     with open(output_dir / md_template_file.stem, "w") as fp:
         fp.write(output_str)
 

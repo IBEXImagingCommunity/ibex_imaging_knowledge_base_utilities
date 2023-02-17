@@ -3,8 +3,12 @@ import pathlib
 import hashlib
 
 from ibex_imaging_knowledge_base_utilities.bib2md import bibfile2md
-from ibex_imaging_knowledge_base_utilities.zenodo_json_2_thewho_md import zenodo_creators_to_md
-from ibex_imaging_knowledge_base_utilities.datadict_glossary_2_contrib_md import dict_glossary_to_md
+from ibex_imaging_knowledge_base_utilities.zenodo_json_2_thewho_md import (
+    zenodo_creators_to_md,
+)
+from ibex_imaging_knowledge_base_utilities.datadict_glossary_2_contrib_md import (
+    dict_glossary_to_md,
+)
 from ibex_imaging_knowledge_base_utilities.reagent_resources_csv_2_md_url import (
     csv_to_md_with_url,
 )
@@ -38,7 +42,7 @@ class BaseTest:
 
 class TestCSV2MD(BaseTest):
     @pytest.mark.parametrize(
-        "md_template_file_name, csv_file_name, supporting_material_root_dir, vendor_to_website_json_file_path, result_md5hash",  # noqa E501
+        "md_template_file_name, csv_file_name, supporting_material_root_dir, vendor_to_website_csv_file_path, result_md5hash",  # noqa E501
         [
             (
                 "reagent_resources.md.in",
@@ -90,7 +94,10 @@ class TestFluorescentProbesCSV2MD(BaseTest):
             csv_file_path=self.data_path / csv_file_name,
             output_dir=tmp_path,
         )
-        assert self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem]) == result_md5hash
+        assert (
+            self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem])
+            == result_md5hash
+        )
 
 
 class TestBib2MD(BaseTest):
@@ -124,7 +131,10 @@ class TestUpdateIndexMDStats(BaseTest):
             self.data_path / csv_file_name,
             output_dir,
         )
-        assert self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem]) == result_md5hash
+        assert (
+            self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem])
+            == result_md5hash
+        )
 
 
 class TestZenodoJsonValidataion(BaseTest):
@@ -147,18 +157,40 @@ class ZenodoJson2Contrib(BaseTest):
             ("the_who.md.in", "zenodo.json", "cfc7c78033d0b88bfffde28c8b684f37"),
         ],
     )
-    def test_zenodo_creators_to_md(self, input_md_file_name, zenodo_json_file_name, result_md5hash, tmp_path):
+    def test_zenodo_creators_to_md(
+        self, input_md_file_name, zenodo_json_file_name, result_md5hash, tmp_path
+    ):
         output_dir = tmp_path
-        zenodo_creators_to_md(self.data / input_md_file_name, self.data_path / zenodo_json_file_name, output_dir)
-        assert self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem]) == result_md5hash
+        zenodo_creators_to_md(
+            self.data / input_md_file_name,
+            self.data_path / zenodo_json_file_name,
+            output_dir,
+        )
+        assert (
+            self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem])
+            == result_md5hash
+        )
+
 
 class TestDictGlossary2Contrib(BaseTest):
     @pytest.mark.parametrize(
         "input_md_file_name, dict_csv_file_name, glossary_csv_file_name, result_md5hash",
-        [("contrib.md.in ", "reagent_data_dict.csv", "reagent_glossary.csv", "c914b681cf98941d9e8f74a4fe4bd892")],
+        [
+            (
+                "contrib.md.in",
+                "reagent_data_dict.csv",
+                "reagent_glossary.csv",
+                "c914b681cf98941d9e8f74a4fe4bd892",
+            )
+        ],
     )
     def test_dict_glossary_to_md(
-            self, input_md_file_name, dict_csv_file_name, glossary_csv_file_name, result_md5hash, tmp_path
+        self,
+        input_md_file_name,
+        dict_csv_file_name,
+        glossary_csv_file_name,
+        result_md5hash,
+        tmp_path,
     ):
         # Write the output using the tmp_path fixture
         output_dir = tmp_path
@@ -168,4 +200,7 @@ class TestDictGlossary2Contrib(BaseTest):
             self.data_path / glossary_csv_file_name,
             output_dir,
         )
-        assert self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem]) == result_md5hash
+        assert (
+            self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem])
+            == result_md5hash
+        )
