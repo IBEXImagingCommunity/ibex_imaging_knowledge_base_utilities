@@ -19,7 +19,7 @@
 import pandas as pd
 import argparse
 import sys
-from .argparse_types import file_path
+from .argparse_types import file_path_endswith_md_in, file_path, dir_path
 
 """
 This script computes statistics from the reagent_resources.csv file and injects them into the input markdown file.
@@ -42,12 +42,15 @@ by the string "NA").
 """
 
 
-def update_index_stats(input_md, input_csv, output_file):
-    with open(input_md, "r") as fp:
+def update_index_stats(md_template_file, input_csv, output_dir):
+    with open(md_template_file, "r") as fp:
         input_md_str = fp.read()
     stats_dictionary = compute_stats_dictionary(input_csv)
-    with open(output_file, "w") as fp:
-        fp.write(input_md_str.format(**stats_dictionary))
+    output_str = input_md_str
+    for k, v in stats_dictionary.items():
+        output_str = output_str.replace("{" + k + "}", str(v))
+    with open(output_dir / md_template_file.stem, "w") as fp:
+        fp.write(output_str)
 
 
 def entry2list(entry):
@@ -114,9 +117,9 @@ def main(argv=None):
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser(description="Update stats in the index.md file.")
     parser.add_argument(
-        "input_md",
-        type=file_path,
-        help="input markdown file which contains the following strings:\n\t"
+        "md_template_file",
+        type=file_path_endswith_md_in,
+        help="Path to template markdown file which contains the following strings:\n\t"
         + "\n\t".join(
             [
                 "{number_of_contributors}",
@@ -130,11 +133,15 @@ def main(argv=None):
     parser.add_argument(
         "input_csv", type=file_path, help="Path to the reagent_resources.csv file."
     )
-    parser.add_argument("output_file", type=str, help="markdown output file name")
+    parser.add_argument(
+        "output_dir",
+        type=dir_path,
+        help="Path to the output directory (the output markdown file is written to this directory).",
+    )
     args = parser.parse_args(argv)
 
     try:
-        update_index_stats(args.input_md, args.input_csv, args.output_file)
+        update_index_stats(args.md_template_file, args.input_csv, args.output_dir)
     except Exception as e:
         print(
             f"{e}",

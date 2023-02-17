@@ -22,7 +22,6 @@ import sys
 import pathlib
 from .argparse_types import file_path, file_path_endswith_md_in, dir_path
 import requests
-import json
 from itertools import chain
 
 """
@@ -69,9 +68,9 @@ request_headers = {
 }
 
 
-def json_to_md_str_dict(json_file_path):
-    with open(json_file_path) as fp:
-        data_dict = json.load(fp)
+def csv_to_md_str_dict(csv_file_path):
+    df = pd.read_csv(csv_file_path, dtype=str, keep_default_na=False)
+    data_dict = dict(zip(df["Vendor"], df["URL"]))
     md_str_dict = {}
     for raw_text, url_target in data_dict.items():
         try:
@@ -177,7 +176,7 @@ def csv_to_md_with_url(
     template_file_path,
     csv_file_path,
     supporting_material_root_dir,
-    vendor_to_website_json_file_path,
+    vendor_to_website_csv_file_path,
 ):
     """
     Convert the IBEX knowledge-base reagent resources csv file to markdown and add links to the supporting
@@ -226,11 +225,11 @@ def csv_to_md_with_url(
         )
         print("Finished linking to UniProt...")
         print("Start linking to vendor websites...")
-        vendor_to_website = json_to_md_str_dict(vendor_to_website_json_file_path)
+        vendor_to_website = csv_to_md_str_dict(vendor_to_website_csv_file_path)
         try:
             df["Vendor"] = df["Vendor"].apply(lambda x: vendor_to_website[x])
         except KeyError as k:
-            print(f"Vendor ({k}) not found in {vendor_to_website_json_file_path}.")
+            print(f"Vendor ({k}) not found in {vendor_to_website_csv_file_path}.")
             return 1
         print("Finished linking to vendor websites...")
 
@@ -262,7 +261,7 @@ def main(argv=None):
     parser.add_argument(
         "vendor_to_website",
         type=file_path,
-        help="JSON file containing the mapping between vendor name and website",
+        help="Path to csv file mapping between vendor name and website/URL, column headers are Vendor, URL.",
     )
     parser.add_argument(
         "supporting_material_root_dir",
@@ -283,7 +282,7 @@ def main(argv=None):
             template_file_path=args.md_template_file,
             csv_file_path=args.csv_file,
             supporting_material_root_dir=args.supporting_material_root_dir,
-            vendor_to_website_json_file_path=args.vendor_to_website,
+            vendor_to_website_csv_file_path=args.vendor_to_website,
         )
     except Exception as e:
         print(

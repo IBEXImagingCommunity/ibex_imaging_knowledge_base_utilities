@@ -2,16 +2,21 @@ import pytest
 import pathlib
 import hashlib
 
+from ibex_imaging_knowledge_base_utilities.bib2md import bibfile2md
+from ibex_imaging_knowledge_base_utilities.zenodo_json_2_thewho_md import (
+    zenodo_creators_to_md,
+)
+from ibex_imaging_knowledge_base_utilities.datadict_glossary_2_contrib_md import (
+    dict_glossary_to_md,
+)
 from ibex_imaging_knowledge_base_utilities.reagent_resources_csv_2_md_url import (
     csv_to_md_with_url,
 )
-from ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md import (
-    fluorescent_probe_csv_to_md,
-)
-
-from ibex_imaging_knowledge_base_utilities.bib2md import bibfile2md
 from ibex_imaging_knowledge_base_utilities.update_index_md_stats import (
     update_index_stats,
+)
+from ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md import (
+    fluorescent_probe_csv_to_md,
 )
 from ibex_imaging_knowledge_base_utilities.validate_zenodo_json import (
     validate_zenodo_json,
@@ -37,13 +42,13 @@ class BaseTest:
 
 class TestCSV2MD(BaseTest):
     @pytest.mark.parametrize(
-        "md_template_file_name, csv_file_name, supporting_material_root_dir, vendor_to_website_json_file_path, result_md5hash",  # noqa E501
+        "md_template_file_name, csv_file_name, supporting_material_root_dir, vendor_to_website_csv_file_path, result_md5hash",  # noqa E501
         [
             (
                 "reagent_resources.md.in",
                 "reagent_resources.csv",
                 "supporting_material",
-                "vendor_urls.json",
+                "vendors_and_urls.csv",
                 "eaaff9000872870cfd0712ecc372f622",
             )
         ],
@@ -53,7 +58,7 @@ class TestCSV2MD(BaseTest):
         md_template_file_name,
         csv_file_name,
         supporting_material_root_dir,
-        vendor_to_website_json_file_path,
+        vendor_to_website_csv_file_path,
         result_md5hash,
     ):
 
@@ -61,7 +66,7 @@ class TestCSV2MD(BaseTest):
             self.data_path / md_template_file_name,
             self.data_path / csv_file_name,
             self.data_path / supporting_material_root_dir,
-            self.data_path / vendor_to_website_json_file_path,
+            self.data_path / vendor_to_website_csv_file_path,
         )
         assert (
             self.files_md5([(self.data_path / csv_file_name).with_suffix(".md")])
@@ -76,19 +81,23 @@ class TestFluorescentProbesCSV2MD(BaseTest):
             (
                 "fluorescent_probes.md.in",
                 "fluorescent_probes.csv",
-                "5a1133df3230beb235bc3e4eda324d90",
+                "a4d6cf59f826e9a8c8b6be49dcfbe5e5",
             )
         ],
     )
     def test_fluorescent_probe_csv_to_md(
         self, md_template_file_name, csv_file_name, result_md5hash, tmp_path
     ):
+        output_dir = tmp_path
         fluorescent_probe_csv_to_md(
             template_file_path=self.data_path / md_template_file_name,
             csv_file_path=self.data_path / csv_file_name,
             output_dir=tmp_path,
         )
-        assert self.files_md5([tmp_path / "fluorescent_probes.md"]) == result_md5hash
+        assert (
+            self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem])
+            == result_md5hash
+        )
 
 
 class TestBib2MD(BaseTest):
@@ -116,13 +125,16 @@ class TestUpdateIndexMDStats(BaseTest):
         self, input_md_file_name, csv_file_name, result_md5hash, tmp_path
     ):
         # Write the output using the tmp_path fixture
-        output_file_path = tmp_path / input_md_file_name
+        output_dir = tmp_path
         update_index_stats(
             self.data_path / input_md_file_name,
             self.data_path / csv_file_name,
-            output_file_path,
+            output_dir,
         )
-        assert self.files_md5([output_file_path]) == result_md5hash
+        assert (
+            self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem])
+            == result_md5hash
+        )
 
 
 class TestZenodoJsonValidataion(BaseTest):
@@ -136,3 +148,59 @@ class TestZenodoJsonValidataion(BaseTest):
     )
     def test_validate_zenodo_json(self, zenodo_json_file_name, result):
         assert validate_zenodo_json(self.data_path / zenodo_json_file_name) == result
+
+
+class ZenodoJson2Contrib(BaseTest):
+    @pytest.mark.parametrize(
+        "input_md_file_name, zenodo_json_file_name, result_md5hash",
+        [
+            ("the_who.md.in", "zenodo.json", "cfc7c78033d0b88bfffde28c8b684f37"),
+        ],
+    )
+    def test_zenodo_creators_to_md(
+        self, input_md_file_name, zenodo_json_file_name, result_md5hash, tmp_path
+    ):
+        output_dir = tmp_path
+        zenodo_creators_to_md(
+            self.data / input_md_file_name,
+            self.data_path / zenodo_json_file_name,
+            output_dir,
+        )
+        assert (
+            self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem])
+            == result_md5hash
+        )
+
+
+class TestDictGlossary2Contrib(BaseTest):
+    @pytest.mark.parametrize(
+        "input_md_file_name, dict_csv_file_name, glossary_csv_file_name, result_md5hash",
+        [
+            (
+                "contrib.md.in",
+                "reagent_data_dict.csv",
+                "reagent_glossary.csv",
+                "c914b681cf98941d9e8f74a4fe4bd892",
+            )
+        ],
+    )
+    def test_dict_glossary_to_md(
+        self,
+        input_md_file_name,
+        dict_csv_file_name,
+        glossary_csv_file_name,
+        result_md5hash,
+        tmp_path,
+    ):
+        # Write the output using the tmp_path fixture
+        output_dir = tmp_path
+        dict_glossary_to_md(
+            self.data_path / input_md_file_name,
+            self.data_path / dict_csv_file_name,
+            self.data_path / glossary_csv_file_name,
+            output_dir,
+        )
+        assert (
+            self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem])
+            == result_md5hash
+        )
