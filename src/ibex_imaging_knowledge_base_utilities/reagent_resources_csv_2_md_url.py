@@ -28,29 +28,29 @@ from itertools import chain
 This script converts the IBEX knowledge-base reagent_resources.csv file to markdown and
 adds hyperlinks between the ORCID entries and the supporting material files.
 The links cannot exist in the original csv file, or in a simple way in an excel
-spreadsheet because we use multiple links in the same table cell (Agree/Disagree), 
-functionality excel does not support in a simple manner. # noqa W291
+spreadsheet because we use multiple links in the same table cell (Agree/Disagree),
+functionality excel does not support in a simple manner.
 
 On the other hand, using markdown for the reagent-resources table does not address all our
-needs either, sorting and filtering are not possible or are very cumbersome. We 
+needs either, sorting and filtering are not possible or are very cumbersome. We
 therefore use the csv file as the official reagent-resources, and it is what
 contributors edit.
- 
+
 Additionally, the script adds hyperlinks between the entries in the "UniProt Accession Number"
-column and their respective entries in the Universal Protein Resource Knowledgebase 
+column and their respective entries in the Universal Protein Resource Knowledge-Base
 (https://www.uniprot.org/uniprotkb), and between the vendor names and their web-sites based on a user
-provided JSON file mapping between the names and URLs. By default the script attempts to get the relevant
+provided csv file mapping between the names and URLs. By default the script attempts to get the relevant
 web page to confirm existence. If the response is not as expected a warning is printed, but the URL is still
 used. We take this approach because some sites are set up to prevent robot scraping and denial of service
-attacks making it more complex to check if the URL exists. 
- 
+attacks making it more complex to check if the URL exists.
+
 The resulting markdown file "reagent_resources.md" is written to the parent directory of the supporting
 material.
 
 This script is automatically run when modifications to the reagent_resources.csv file are merged
-into the main branch of the ibex_knowledge_base repository (see .github/workflows/data2md.yml).
+into the main branch of the ibex_knowledge_base repository (see .github/workflows/main.yml).
 
-Assumption: The reagent_resources.csv file is valid. It conforms to the expected format (empty entries denoted 
+Assumption: The reagent_resources.csv file is valid. It conforms to the expected format (empty entries denoted
 by the string "NA").
 """
 
@@ -110,6 +110,26 @@ def data_to_md_str(data, supporting_material_root_dir):
     Together these define the path to the supporting material file:
     "Target Name / Protein Biomarker"_"Conjugate"/ORCID.md
     """
+    # List of characters that will be replaced with an underscore. Some of these are invalid
+    # in file paths in windows/linux/osx and some don't work well when they appear in file
+    # paths used by jekyll and GitHub to create a static page. We replace all of them with
+    # an underscore.
+    invalid_chars = [
+        " ",
+        "\t",
+        "/",
+        "\\",
+        "{",
+        "}",
+        "[",
+        "]",
+        "(",
+        ")",
+        "<",
+        ">",
+        ":",
+        "&",
+    ]
     if data[0].strip() == "NA":
         urls_str = "NA"
     else:
@@ -120,13 +140,13 @@ def data_to_md_str(data, supporting_material_root_dir):
             # file exists, data validation happens prior to conversion of data to markdown.
             tc_subpath = replace_char_list(
                 input_str=f"{data[1]}_{data[2]}",
-                change_chars_list=[" ", "\t", "/", "\\", "{", "}", "[", "]", "(", ")"],
+                change_chars_list=invalid_chars,
                 replacement_char="_",
             )
             urls_str += f"[{v}]({supporting_material_root_dir}/{tc_subpath}/{v}.md), "
         tc_subpath = replace_char_list(
             input_str=f"{data[1]}_{data[2]}",
-            change_chars_list=[" ", "\t", "/", "\\", "{", "}", "[", "]", "(", ")"],
+            change_chars_list=invalid_chars,
             replacement_char="_",
         )
         urls_str += (
