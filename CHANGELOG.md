@@ -24,7 +24,8 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 ## v0.4.1
 
 ### Fixed
-reagent_resources_csv_2_md_url - Paths to supporting file names cannot contain any of the following characters: " ", "\t", "/", "\", "{", "}", "[", "]", "(", ")", "<", ">", ":", "&". All of them are replaced with underscore. Previously "&" was not replaced and it caused problems linking to the supporting material files.
+* reagent_resources_csv_2_md_url - Paths to supporting file names cannot contain any of the following characters: " ", "\t", "/", "\", "{", "}", "[", "]", "(", ")", "<", ">", ":", "&". All of them are replaced with underscore. Previously "&" was not replaced and it caused problems linking to the supporting material files.
+* datadict_glossary_2_contrib_md - Insertion of tables into the input markdown file is done via the string `replace` and not the `format` method because the use of `format` precludes the presence of curly braces in the template file. We now need to use curly braces in the input contrib markdown file.
 
 ## v0.4.0
 

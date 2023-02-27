@@ -32,11 +32,14 @@ def dict_glossary_to_md(
         input_md_str = fp.read()
     with open(output_dir / template_file_path.stem, "w") as fp:
         fp.write(
-            input_md_str.format(
-                reagent_metadata_table=dict_df.to_markdown(
+            input_md_str.replace(
+                "{reagent_metadata_table}",
+                dict_df.to_markdown(
                     index=False, colalign=["left"] * len(dict_df.columns)
                 ),
-                glossary_table=glossary_df.to_markdown(
+            ).replace(
+                "{glossary_table}",
+                glossary_df.to_markdown(
                     index=False, colalign=["left"] * len(glossary_df.columns)
                 ),
             )
