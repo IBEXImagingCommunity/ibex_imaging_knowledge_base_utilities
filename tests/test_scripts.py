@@ -208,6 +208,7 @@ class TestDictGlossary2Contrib(BaseTest):
             == result_md5hash
         )
 
+
 class TestCSV2Supporting(BaseTest):
     @pytest.mark.parametrize(
         "csv_file, supporting_template_file, output_file_paths, result_md5hash",
@@ -215,11 +216,13 @@ class TestCSV2Supporting(BaseTest):
             (
                 "reagent_batch.csv",
                 "supporting_template.md",
-                ["CD106_PE/0000-0003-4379-8967.md",
-                 "CD20_AF488/0000-0001-9561-4256.md",
-                 "CD20_AF488/0000-0003-4379-8967.md",
-                 "Granzyme_B_Unconjugated/0000-0001-9561-4256.md",
-                 "Ki-67_BV510/0000-0001-9561-4256.md"],
+                [
+                    "CD106_PE/0000-0003-4379-8967.md",
+                    "CD20_AF488/0000-0001-9561-4256.md",
+                    "CD20_AF488/0000-0003-4379-8967.md",
+                    "Granzyme_B_Unconjugated/0000-0001-9561-4256.md",
+                    "Ki-67_BV510/0000-0001-9561-4256.md",
+                ],
                 "fef0d00fc54b4f8040132a0c83e3b05d",
             )
         ],
