@@ -18,6 +18,9 @@ from ibex_imaging_knowledge_base_utilities.update_index_md_stats import (
 from ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md import (
     fluorescent_probe_csv_to_md,
 )
+from ibex_imaging_knowledge_base_utilities.csv_2_supporting import (
+    csv_2_supporting,
+)
 from ibex_imaging_knowledge_base_utilities.validate_zenodo_json import (
     validate_zenodo_json,
 )
@@ -202,5 +205,44 @@ class TestDictGlossary2Contrib(BaseTest):
         )
         assert (
             self.files_md5([output_dir / pathlib.Path(input_md_file_name).stem])
+            == result_md5hash
+        )
+
+
+class TestCSV2Supporting(BaseTest):
+    @pytest.mark.parametrize(
+        "csv_file, supporting_template_file, output_file_paths, result_md5hash",
+        [
+            (
+                "reagent_batch.csv",
+                "supporting_template.md",
+                [
+                    "CD106_PE/0000-0003-4379-8967.md",
+                    "CD20_AF488/0000-0001-9561-4256.md",
+                    "CD20_AF488/0000-0003-4379-8967.md",
+                    "Granzyme_B_Unconjugated/0000-0001-9561-4256.md",
+                    "Ki-67_BV510/0000-0001-9561-4256.md",
+                ],
+                "a7406b230dce81408abc583b2db4e1a6",
+            )
+        ],
+    )
+    def test_csv_to_supporting(
+        self,
+        csv_file,
+        supporting_template_file,
+        output_file_paths,
+        result_md5hash,
+        tmp_path,
+    ):
+        # Write the output using the tmp_path fixture
+        output_dir = tmp_path
+        csv_2_supporting(
+            self.data_path / csv_file,
+            output_dir,
+            self.data_path / supporting_template_file,
+        )
+        assert (
+            self.files_md5([output_dir / file_path for file_path in output_file_paths])
             == result_md5hash
         )
