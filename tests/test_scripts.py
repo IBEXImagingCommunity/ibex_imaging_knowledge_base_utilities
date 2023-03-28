@@ -33,13 +33,19 @@ class BaseTest:
 
     def files_md5(self, file_path_list):
         """
-        Compute a single/combined md5 hash for a list of files.
+        Compute a single/combined md5 hash for a list of files. Open each file as text and use the read() method which
+        to quote the documentation:
+        In text mode, the default when reading is to convert platform-specific line endings (\n on Unix, \r\n on
+        Windows) to just \n.
+
+        This ensures that we get the same md5 hash on all platforms. If we opened the text files as binary the hashes
+        become platform dependent (\r\n vs. \n).
         """
         md5 = hashlib.md5()
         for file_name in file_path_list:
-            with open(file_name, "rb") as fp:
-                for mem_block in iter(lambda: fp.read(128 * md5.block_size), b""):
-                    md5.update(mem_block)
+            with open(file_name, "r") as fp:
+                file_contents = fp.read()
+                md5.update(file_contents.encode("utf-8"))
         return md5.hexdigest()
 
 
