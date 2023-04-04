@@ -21,6 +21,9 @@ from ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md import (
 from ibex_imaging_knowledge_base_utilities.csv_2_supporting import (
     csv_2_supporting,
 )
+from ibex_imaging_knowledge_base_utilities.protocols_csv_2_md import (
+    protocols_csv_to_md,
+)
 from ibex_imaging_knowledge_base_utilities.validate_zenodo_json import (
     validate_zenodo_json,
 )
@@ -250,5 +253,31 @@ class TestCSV2Supporting(BaseTest):
         )
         assert (
             self.files_md5([output_dir / file_path for file_path in output_file_paths])
+            == result_md5hash
+        )
+
+
+class TestProtocolsCSV2MD(BaseTest):
+    @pytest.mark.parametrize(
+        "md_template_file_name, csv_file_name, result_md5hash",
+        [
+            (
+                "protocols.md.in",
+                "protocols.csv",
+                "b48e11fb1917376b9998c14608bfef7d",
+            )
+        ],
+    )
+    def test_protocols_csv_to_md(
+        self, md_template_file_name, csv_file_name, result_md5hash, tmp_path
+    ):
+        output_dir = tmp_path
+        protocols_csv_to_md(
+            template_file_path=self.data_path / md_template_file_name,
+            csv_file_path=self.data_path / csv_file_name,
+            output_dir=output_dir,
+        )
+        assert (
+            self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem])
             == result_md5hash
         )

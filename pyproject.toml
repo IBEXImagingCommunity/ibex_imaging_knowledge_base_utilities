@@ -9,7 +9,7 @@ name = "ibex_imaging_knowledge_base_utilities"
 version = "0.5.0"
 authors = [{ name="Ziv Yaniv", email="zivyaniv@nih.gov" },
 ]
-description = "Utility scripts used for maintaining the IBEX Imaging Community Knowledge-Base"
+description = "Utility scripts used for managing the IBEX Imaging Community Knowledge-Base"
 readme = "README.md"
 requires-python = ">=3.10.0"
 classifiers = [
@@ -34,5 +34,6 @@ fluorescent_probes_csv_2_md = "ibex_imaging_knowledge_base_utilities.fluorescent
 update_index_md_stats = "ibex_imaging_knowledge_base_utilities.update_index_md_stats:main"
 data_dict_glossary_2_contrib_md = "ibex_imaging_knowledge_base_utilities.datadict_glossary_2_contrib_md:main"
 zenodo_json_2_thewho_md = "ibex_imaging_knowledge_base_utilities.zenodo_json_2_thewho_md:main"
+protocols_csv_2_md = "ibex_imaging_knowledge_base_utilities.protocols_csv_2_md:main"
 csv2supporting = "ibex_imaging_knowledge_base_utilities.csv_2_supporting:main"
 validate_zenodo_json = "ibex_imaging_knowledge_base_utilities.validate_zenodo_json:main"
