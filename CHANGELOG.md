@@ -22,6 +22,7 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 ## Unreleased
 
 ### Added
+* protocols_csv_2_md - Utility script which converts the protocols.csv data to the markdown file used by the site.
 * csv_2_supporting - Utility script which enables batch creation of supporting material files from a csv file with similar structure to the reagent_resources.csv plus two additional columns "Publications" and "Notes".
 
 ## v0.4.1
