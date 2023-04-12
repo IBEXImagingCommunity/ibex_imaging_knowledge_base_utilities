@@ -41,7 +41,14 @@ def _description_2_md(description):
             num_spaces = num_spaces + 1
             if num_spaces == num_words:
                 break
-    return f"<details ><summary>{description[0:i]}...</summary><p>{description}</p></details>"
+    # Because the html code will go inside a markdown table and we are using kramdown,
+    # default markdown renderer for jekyll, we need to wrap it with nomarkdown to tell kramdown to leave it
+    # as is.
+    return (
+        "{::nomarkdown}"
+        + f"<details ><summary>{description[0:i]}...</summary><p>{description}</p></details>"
+        + "{:/}"
+    )
 
 
 def protocols_csv_to_md(template_file_path, csv_file_path, output_dir):
