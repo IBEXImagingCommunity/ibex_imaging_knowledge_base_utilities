@@ -264,7 +264,7 @@ class TestProtocolsCSV2MD(BaseTest):
             (
                 "protocols.md.in",
                 "protocols.csv",
-                "b48e11fb1917376b9998c14608bfef7d",
+                "ae265c655481dc8cabf540f82b804b71",
             )
         ],
     )
