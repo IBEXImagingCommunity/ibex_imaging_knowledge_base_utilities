@@ -20,6 +20,7 @@ import sys
 import json
 import argparse
 from .argparse_types import file_path
+from .url_exists import check_urls
 
 """
 This script validates the contents of the .zenodo.json file:
@@ -103,6 +104,14 @@ def validate_zenodo_json(zenodo_json):
     if duplicates:
         print(f"Duplicate entries in creators section: {duplicates}.")
         return 1
+    # Check that the ORCID url exists. Do not allow redirects because the site forwards non existent urls to the
+    # ORCID registration page, so even if the page doesn't exist there is no 404 error.
+    orcid_urls_exist = check_urls([f"https://orcid.org/{c['orcid']}" for c in zenodo_dict["creators"]], allow_redirects=False)
+    orcid_errors = [creator for url_exist, creator in zip(orcid_urls_exist,zenodo_dict["creators"]) if not url_exist]
+    if orcid_errors:
+        print("The ORCID for the following entries is incorrect:\n")
+        print(orcid_errors)
+        return 1
     # First ORCID and two last ORCIDs are fixed, the entries in between are according
     # to alphabetical order
     if (
@@ -119,6 +128,7 @@ def validate_zenodo_json(zenodo_json):
             "Order in creators list is not as expected. First entry and last two are fixed and those in between should be in alphabetical order."  # noqa E501
         )
         return 1
+
     # Check grant uniqueness
     grant_ids = []
     for data in zenodo_dict["grants"]:
