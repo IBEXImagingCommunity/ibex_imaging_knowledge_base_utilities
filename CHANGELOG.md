@@ -21,6 +21,9 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+### Changed
+* validate_zenodo_json - Additional validation, check that the listed ORCIDs have corresponding pages on [https://orcid.org/](https://orcid.org/).
+
 ## v0.5.0
 
 ### Added

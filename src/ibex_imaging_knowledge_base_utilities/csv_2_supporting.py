@@ -141,7 +141,10 @@ def create_md_files(
                 for r in publication.split(";")
             ]
         )
-        publications_list = list(
+        # We sort the resulting intersection set even though it is not necessary from a functionality standpoint.
+        # It is necessary for obtaining consistent results for testing. Otherwise, the order can change
+        # in repeated script runs.
+        publications_list = sorted(
             actual_publications.intersection(publications_dict.keys())
         )
         publications_str = "\n".join(

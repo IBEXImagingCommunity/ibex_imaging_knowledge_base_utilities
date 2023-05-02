@@ -85,8 +85,9 @@ def check_urls(
     **kwargs
 ):
     """
-    Check url existence for a number of urls in a container. It is assumed that the urls are for different hosts (if they are
-    on the same host then better to use a requests.Session object).
+    Check url existence for a number of urls in a container. It is assumed that the urls
+    are for different hosts (if they are on the same host then better to use a
+    requests.Session object).
     """
     with ThreadPoolExecutor(num_threads) as executor:
         return list(
