@@ -21,6 +21,9 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+### Added
+* videos_csv_2_md - Utility script which converts the videos.csv data to the markdown file used by the site.
+
 ### Changed
 * validate_zenodo_json - Additional validation, check that the listed ORCIDs have corresponding pages on [https://orcid.org/](https://orcid.org/).
 

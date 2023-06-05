@@ -53,6 +53,7 @@ jobs:
         data_dict_glossary_2_contrib_md -h
         zenodo_json_2_thewho_md -h
         protocols_csv_2_md -h
+        videos_csv_2_md -h
         csv2supporting -h
         validate_zenodo_json -h
         python -m pytest -v --tb=short

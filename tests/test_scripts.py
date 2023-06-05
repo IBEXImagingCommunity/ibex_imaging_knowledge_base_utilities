@@ -24,6 +24,9 @@ from ibex_imaging_knowledge_base_utilities.csv_2_supporting import (
 from ibex_imaging_knowledge_base_utilities.protocols_csv_2_md import (
     protocols_csv_to_md,
 )
+from ibex_imaging_knowledge_base_utilities.videos_csv_2_md import (
+    videos_csv_to_md,
+)
 from ibex_imaging_knowledge_base_utilities.validate_zenodo_json import (
     validate_zenodo_json,
 )
@@ -273,6 +276,32 @@ class TestProtocolsCSV2MD(BaseTest):
     ):
         output_dir = tmp_path
         protocols_csv_to_md(
+            template_file_path=self.data_path / md_template_file_name,
+            csv_file_path=self.data_path / csv_file_name,
+            output_dir=output_dir,
+        )
+        assert (
+            self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem])
+            == result_md5hash
+        )
+
+
+class TestVideosCSV2MD(BaseTest):
+    @pytest.mark.parametrize(
+        "md_template_file_name, csv_file_name, result_md5hash",
+        [
+            (
+                "videos.md.in",
+                "videos.csv",
+                "b13fe2c14df546221b8f64302db8a300",
+            )
+        ],
+    )
+    def test_videos_csv_to_md(
+        self, md_template_file_name, csv_file_name, result_md5hash, tmp_path
+    ):
+        output_dir = tmp_path
+        videos_csv_to_md(
             template_file_path=self.data_path / md_template_file_name,
             csv_file_path=self.data_path / csv_file_name,
             output_dir=output_dir,
