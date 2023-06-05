@@ -20,6 +20,7 @@ import sys
 import json
 import argparse
 from .argparse_types import file_path
+from .url_exists import check_urls
 
 """
 This script validates the contents of the .zenodo.json file:
@@ -73,13 +74,15 @@ def validate_zenodo_json(zenodo_json):
     }
     if zenodo_dict.keys() != json_key_types.keys():
         print(
-            f"Unexpected or missing key types in file. Expected keys ({json_key_types.keys()}), actual keys ({zenodo_dict.keys()})."  # noqa E501
+            f"Unexpected or missing key types in file. Expected keys ({json_key_types.keys()}), actual keys ({zenodo_dict.keys()}).",  # noqa E501
+            file=sys.stderr,
         )
         return 1
     for key in json_key_types.keys():
         if type(zenodo_dict[key]) != json_key_types[key]:
             print(
-                f"Unexpected entry type for key ({key}). Expected {json_key_types[key]}, got ({type(zenodo_dict[key])})."  # noqa E501
+                f"Unexpected entry type for key ({key}). Expected {json_key_types[key]}, got ({type(zenodo_dict[key])}).",  # noqa E501
+                file=sys.stderr,
             )
             return 1
 
@@ -94,14 +97,32 @@ def validate_zenodo_json(zenodo_json):
             or data["name"].strip() == ""
             or data["orcid"].strip() == ""
         ):
-            print(f"Missing required information in creators section, entry {data}.")
+            print(
+                f"Missing required information in creators section, entry {data}.",
+                file=sys.stderr,
+            )
             return 1
         orcids.append(data["orcid"])
     # Check creator uniqueness
     existing_orcids = set()
     duplicates = [o for o in orcids if o in existing_orcids or existing_orcids.add(o)]
     if duplicates:
-        print(f"Duplicate entries in creators section: {duplicates}.")
+        print(f"Duplicate entries in creators section: {duplicates}.", file=sys.stderr)
+        return 1
+    # Check that the ORCID url exists. Do not allow redirects because the site forwards nonexistent urls to the
+    # ORCID registration page, so even if the page doesn't exist there is no 404 error.
+    orcid_urls_exist = check_urls(
+        [f"https://orcid.org/{c['orcid']}" for c in zenodo_dict["creators"]],
+        allow_redirects=False,
+    )
+    orcid_errors = [
+        creator
+        for url_exist, creator in zip(orcid_urls_exist, zenodo_dict["creators"])
+        if not url_exist
+    ]
+    if orcid_errors:
+        print("The ORCID for the following entries is incorrect:\n", file=sys.stderr)
+        print(orcid_errors, file=sys.stderr)
         return 1
     # First ORCID and two last ORCIDs are fixed, the entries in between are according
     # to alphabetical order
@@ -116,14 +137,19 @@ def validate_zenodo_json(zenodo_json):
         )
     ):
         print(
-            "Order in creators list is not as expected. First entry and last two are fixed and those in between should be in alphabetical order."  # noqa E501
+            "Order in creators list is not as expected. First entry and last two are fixed and those in between should be in alphabetical order.",  # noqa E501
+            file=sys.stderr,
         )
         return 1
+
     # Check grant uniqueness
     grant_ids = []
     for data in zenodo_dict["grants"]:
         if data["id"].strip() == "":
-            print(f"Missing required information in grants section, entry {data}.")
+            print(
+                f"Missing required information in grants section, entry {data}.",
+                file=sys.stderr,
+            )
             return 1
         grant_ids.append(data["id"])
     existing_grants = set()
@@ -131,7 +157,7 @@ def validate_zenodo_json(zenodo_json):
         g for g in grant_ids if g in existing_grants or existing_grants.add(g)
     ]
     if duplicates:
-        print(f"Duplicate entries in grants section: {duplicates}.")
+        print(f"Duplicate entries in grants section: {duplicates}.", file=sys.stderr)
         return 1
     return 0
 
