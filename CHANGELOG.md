@@ -21,6 +21,8 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v0.6.0
+
 ### Added
 * videos_csv_2_md - Utility script which converts the videos.csv data to the markdown file used by the site.
 
