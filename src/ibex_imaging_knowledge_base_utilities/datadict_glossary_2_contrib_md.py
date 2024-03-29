@@ -19,7 +19,7 @@
 import sys
 import pandas as pd
 import argparse
-from .argparse_types import file_path, file_path_endswith_md_in, dir_path
+from .argparse_types import file_path_endswith, dir_path
 
 
 def dict_glossary_to_md(
@@ -54,16 +54,18 @@ def main(argv=None):
     )
     parser.add_argument(
         "md_template_file",
-        type=file_path_endswith_md_in,
+        type=lambda x: file_path_endswith(x, ".md.in"),
         help='Path to template markdown file which contains the strings "{reagent_metadata_table}" and "{glossary_table}".',  # noqa E501
     )
     parser.add_argument(
         "data_dictionary",
-        type=file_path,
+        type=lambda x: file_path_endswith(x, ".csv"),
         help="Path to the reagent data dictionary csv file.",
     )
     parser.add_argument(
-        "glossary", type=file_path, help="Path to the glossary csv file."
+        "glossary",
+        type=lambda x: file_path_endswith(x, ".csv"),
+        help="Path to the glossary csv file.",
     )
     parser.add_argument(
         "output_dir",

@@ -22,23 +22,14 @@ import argparse
 # definitions of argparse types, enables argparse to validate the command line parameters
 
 
-def file_path_endswith_md_in(path):
-    p = pathlib.Path(path)
-    if p.is_file() and path.endswith(".md.in"):
+def file_path_endswith(path_str, ends_with_pattern=""):
+    p = pathlib.Path(path_str)
+    if p.is_file() and path_str.endswith(ends_with_pattern):
         return p
     else:
         raise argparse.ArgumentTypeError(
-            f'Invalid argument ({path}), not a file path, file does not exist, or path does not end with ".md.in".'
-        )
-
-
-def file_path(path):
-    p = pathlib.Path(path)
-    if p.is_file():
-        return p
-    else:
-        raise argparse.ArgumentTypeError(
-            f"Invalid argument ({path}), not a file path or file does not exist."
+            f"Invalid argument ({path_str}), not a file path, file does not exist, or path does not"
+            + f' end with "{ends_with_pattern}".'
         )
 
 

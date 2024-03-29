@@ -19,7 +19,7 @@
 import sys
 import json
 import argparse
-from .argparse_types import file_path, file_path_endswith_md_in, dir_path
+from .argparse_types import file_path_endswith, dir_path
 
 
 def zenodo_creators_to_md(template_file_path, zenodo_json_file_path, output_dir):
@@ -46,11 +46,13 @@ def main(argv=None):
     )
     parser.add_argument(
         "md_template_file",
-        type=file_path_endswith_md_in,
+        type=lambda x: file_path_endswith(x, ".md.in"),
         help='Path to template markdown file which contains the string "{contributor_list}".',
     )
     parser.add_argument(
-        "zenodo_json", type=file_path, help="Path to the .zenodo.json file."
+        "zenodo_json",
+        type=lambda x: file_path_endswith(x, ".json"),
+        help="Path to the .zenodo.json file.",
     )
     parser.add_argument(
         "output_dir",

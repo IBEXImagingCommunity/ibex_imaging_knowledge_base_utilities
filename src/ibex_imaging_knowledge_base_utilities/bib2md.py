@@ -21,7 +21,7 @@ import subprocess
 import tempfile
 import argparse
 import sys
-from .argparse_types import file_path
+from .argparse_types import file_path_endswith
 
 """
 This script creates the publications markdown page from the publications.bib bibliography
@@ -108,13 +108,15 @@ def main(argv=None):
         description="Create publications markdown file from a bib file."
     )
     parser.add_argument(
-        "bib_file", type=file_path, help="bibliography file in bibtex/biblatex format"
+        "bib_file",
+        type=lambda x: file_path_endswith(x, ".bib"),
+        help="bibliography file in bibtex/biblatex format",
     )
     parser.add_argument(
         "csl_file",
-        type=file_path,
+        type=lambda x: file_path_endswith(x, ".csl"),
         help="citation style language file for formatting the bibliography "
-        + "(donwload and view style files from zotero site https://www.zotero.org/styles)",
+        + "(download and view style files from zotero site https://www.zotero.org/styles)",
     )
     parser.add_argument("output_file", type=str, help="markdown output file name")
     args = parser.parse_args(argv)
