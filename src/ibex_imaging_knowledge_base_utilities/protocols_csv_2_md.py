@@ -19,17 +19,17 @@
 import pandas as pd
 import argparse
 import sys
-from .argparse_types import file_path, file_path_endswith_md_in, dir_path
+from .argparse_types import file_path_endswith, dir_path
 
 
 """
 This script converts the IBEX knowledge-base protocols.csv file to markdown.
 
-This script is automatically run when modifications to the protocols.csv file are merged
+The script is automatically run when modifications to the protocols.csv file are merged
 into the main branch of the ibex_knowledge_base repository (see .github/workflows/data2md.yml).
 
 Assumption: The protocols.csv file is valid. It conforms to the expected format
-            (three columns titled: Title,URL,Details).
+            (includes columns titled: Title,URL,Details).
 """
 
 
@@ -86,11 +86,13 @@ def main(argv=None):
     )
     parser.add_argument(
         "md_template_file",
-        type=file_path_endswith_md_in,
+        type=lambda x: file_path_endswith(x, ".md.in"),
         help='Path to template markdown file which contains the string "{protocol_table}".',
     )
     parser.add_argument(
-        "csv_file", type=file_path, help="Path to the protocols.csv file."
+        "csv_file",
+        type=lambda x: file_path_endswith(x, ".csv"),
+        help="Path to the protocols.csv file.",
     )
     parser.add_argument(
         "output_dir",

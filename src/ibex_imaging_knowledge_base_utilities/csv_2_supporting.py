@@ -21,7 +21,7 @@ import numpy as np
 import pathlib
 import argparse
 import sys
-from .argparse_types import file_path, dir_path
+from .argparse_types import file_path_endswith, dir_path
 
 """
 This utility script facilitates batch creation of supporting material files from a comma-separated-value
@@ -265,8 +265,10 @@ def main(argv=None):
         description="Create supporting material files from a csv which has the same structure as the "
         + 'reagent_resources.csv and two additional columns "Publications" and "Notes".'
     )
-    parser.add_argument("csv_file", type=file_path)
-    parser.add_argument("supporting_template_file", type=file_path)
+    parser.add_argument("csv_file", type=lambda x: file_path_endswith(x, ".csv"))
+    parser.add_argument(
+        "supporting_template_file", type=lambda x: file_path_endswith(x, ".md.in")
+    )
     parser.add_argument("supporting_material_root_dir", type=dir_path)
     args = parser.parse_args(argv)
 

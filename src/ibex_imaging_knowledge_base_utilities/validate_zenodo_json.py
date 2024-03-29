@@ -19,7 +19,7 @@
 import sys
 import json
 import argparse
-from .argparse_types import file_path
+from .argparse_types import file_path_endswith
 from .url_exists import check_urls
 
 """
@@ -166,7 +166,11 @@ def main(argv=None):
     if argv is None:  # script was invoked from commandline
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser(description="Validate .zenodo.json file content.")
-    parser.add_argument("zenodo_json", type=file_path, help=".zenodo.json file")
+    parser.add_argument(
+        "zenodo_json",
+        type=lambda x: file_path_endswith(x, ".json"),
+        help=".zenodo.json file",
+    )
     args = parser.parse_args(argv)
 
     return validate_zenodo_json(args.zenodo_json)
