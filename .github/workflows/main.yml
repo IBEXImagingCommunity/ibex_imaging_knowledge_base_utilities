@@ -82,7 +82,7 @@ jobs:
         with:
           name: ibex_imaging_python_wheels
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: ibex_imaging_knowledge_base_utilities-*any.whl
           body_path: release_notes.txt
