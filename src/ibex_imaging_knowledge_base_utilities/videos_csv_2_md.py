@@ -21,6 +21,7 @@ import argparse
 import sys
 from .argparse_types import file_path_endswith, dir_path
 from datetime import date
+from .utilities import _description_2_md
 
 """
 This script converts the IBEX knowledge-base videos.csv file to markdown.
@@ -32,26 +33,6 @@ Assumption: The videos.csv file is valid. It conforms to the expected format
             (includes columns titled: Title,URL,Details,Category,Year,Month,Day).
             Category entries are either "general" or "tutorial".
 """
-
-
-def _description_2_md(description):
-    if not description.strip():
-        return ""
-    num_words = 3  # number of words in the short description
-    num_spaces = 0
-    for i, c in enumerate(description):
-        if c == " ":
-            num_spaces = num_spaces + 1
-            if num_spaces == num_words:
-                break
-    # Because the html code will go inside a markdown table and we are using kramdown,
-    # default markdown renderer for jekyll, we need to wrap it with nomarkdown to tell kramdown to leave it
-    # as is.
-    return (
-        "{::nomarkdown}"
-        + f"<details ><summary>{description[0:i]}...</summary><p>{description}</p></details>"
-        + "{:/}"
-    )
 
 
 def videos_csv_to_md(template_file_path, csv_file_path, output_dir):

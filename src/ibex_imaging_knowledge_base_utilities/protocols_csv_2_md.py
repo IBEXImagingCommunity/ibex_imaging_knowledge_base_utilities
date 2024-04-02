@@ -20,7 +20,7 @@ import pandas as pd
 import argparse
 import sys
 from .argparse_types import file_path_endswith, dir_path
-
+from .utilities import _description_2_md
 
 """
 This script converts the IBEX knowledge-base protocols.csv file to markdown.
@@ -31,24 +31,6 @@ into the main branch of the ibex_knowledge_base repository (see .github/workflow
 Assumption: The protocols.csv file is valid. It conforms to the expected format
             (includes columns titled: Title,URL,Details).
 """
-
-
-def _description_2_md(description):
-    num_words = 3  # number of words in the short description
-    num_spaces = 0
-    for i, c in enumerate(description):
-        if c == " ":
-            num_spaces = num_spaces + 1
-            if num_spaces == num_words:
-                break
-    # Because the html code will go inside a markdown table and we are using kramdown,
-    # default markdown renderer for jekyll, we need to wrap it with nomarkdown to tell kramdown to leave it
-    # as is.
-    return (
-        "{::nomarkdown}"
-        + f"<details ><summary>{description[0:i]}...</summary><p>{description}</p></details>"
-        + "{:/}"
-    )
 
 
 def protocols_csv_to_md(template_file_path, csv_file_path, output_dir):
