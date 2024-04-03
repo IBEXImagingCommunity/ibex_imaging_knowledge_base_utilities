@@ -20,7 +20,7 @@ import pandas as pd
 import argparse
 import sys
 from .argparse_types import file_path_endswith, dir_path
-
+from .utilities import _dataframe_2_md
 
 """
 This script converts the IBEX knowledge-base fluorescent_probes.csv file to markdown.
@@ -48,8 +48,8 @@ def fluorescent_probe_csv_to_md(template_file_path, csv_file_path, output_dir):
     with open(output_dir / template_file_path.stem, "w") as fp:
         fp.write(
             input_md_str.format(
-                probe_table=df.to_markdown(
-                    index=False, colalign=["left"] * len(df.columns)
+                probe_table=_dataframe_2_md(
+                    df, index=False, colalign=["left"] * len(df.columns)
                 )
             )
         )

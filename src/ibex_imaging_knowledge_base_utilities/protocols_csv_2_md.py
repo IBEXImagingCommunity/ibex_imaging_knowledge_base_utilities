@@ -20,7 +20,7 @@ import pandas as pd
 import argparse
 import sys
 from .argparse_types import file_path_endswith, dir_path
-from .utilities import _description_2_md
+from .utilities import _description_2_md, _dataframe_2_md
 
 """
 This script converts the IBEX knowledge-base protocols.csv file to markdown.
@@ -53,8 +53,8 @@ def protocols_csv_to_md(template_file_path, csv_file_path, output_dir):
     with open(output_dir / template_file_path.stem, "w") as fp:
         fp.write(
             input_md_str.format(
-                protocols_table=df[["Title", "Details"]].to_markdown(
-                    index=False, colalign=["left", "left"]
+                protocols_table=_dataframe_2_md(
+                    df[["Title", "Details"]], index=False, colalign=["left", "left"]
                 )
             )
         )
