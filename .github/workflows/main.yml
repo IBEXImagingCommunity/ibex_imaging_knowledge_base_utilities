@@ -56,6 +56,7 @@ jobs:
         videos_csv_2_md -h
         csv2supporting -h
         validate_zenodo_json -h
+        data_software_csv_2_md -h
         python -m pytest -v --tb=short
     - name: Upload wheels
       if: github.event_name == 'push'

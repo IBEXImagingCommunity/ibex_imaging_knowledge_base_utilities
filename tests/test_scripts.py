@@ -27,8 +27,13 @@ from ibex_imaging_knowledge_base_utilities.protocols_csv_2_md import (
 from ibex_imaging_knowledge_base_utilities.videos_csv_2_md import (
     videos_csv_to_md,
 )
+
 from ibex_imaging_knowledge_base_utilities.validate_zenodo_json import (
     validate_zenodo_json,
+)
+
+from ibex_imaging_knowledge_base_utilities.data_software_csv_2_md import (
+    data_software_csv_to_md,
 )
 
 
@@ -304,6 +309,39 @@ class TestVideosCSV2MD(BaseTest):
         videos_csv_to_md(
             template_file_path=self.data_path / md_template_file_name,
             csv_file_path=self.data_path / csv_file_name,
+            output_dir=output_dir,
+        )
+        assert (
+            self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem])
+            == result_md5hash
+        )
+
+
+class TestDataSetsSoftwareCSV2MD(BaseTest):
+    @pytest.mark.parametrize(
+        "md_template_file_name, datasets_csv_file_name, software_csv_file_name, result_md5hash",
+        [
+            (
+                "data_and_software.md.in",
+                "datasets.csv",
+                "software.csv",
+                "4d8f6173fc1d4dd026c28f00e3705d44",
+            )
+        ],
+    )
+    def test_datasets_software_csv_to_md(
+        self,
+        md_template_file_name,
+        datasets_csv_file_name,
+        software_csv_file_name,
+        result_md5hash,
+        tmp_path,
+    ):
+        output_dir = tmp_path
+        data_software_csv_to_md(
+            template_file_path=self.data_path / md_template_file_name,
+            data_csv_file_path=self.data_path / datasets_csv_file_name,
+            software_csv_file_path=self.data_path / software_csv_file_name,
             output_dir=output_dir,
         )
         assert (

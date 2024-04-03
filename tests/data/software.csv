@@ -1,0 +1,13 @@
+Title,Details,Year,URL,Repository,Language,License,Associated Publication DOIs
+SITK-IBEX,"Software for aligning/registering images acquired with the IBEX microscopy imaging technique. This Python package enables alignment of multiple cycles of fluorescence images, acquired using IBEX. A repeated marker is used to register all panels to a selected panel (in the registration nomenclature this is the fixed image). After registration all panels are resampled onto the fixed image.
+
+While this method was developed for a specific imaging protocol, it will likely work for other  protocols that contain a repeated marker. The registration approach is implemented using the [SimpleITK](https://www.simpleitk.org) toolkit registration framework.
+
+The key implementation aspects include:
+
+1. Multi-phase based approach with robust initialization.
+2. Multi-resolution and point sampling.
+3. Affine transformation model.
+4. Use of correlation as optimized similarity metric.",2020,https://pypi.org/project/sitkibex/,https://github.com/niaid/sitk-ibex,Python,Apache-2.0,10.1073/pnas.2018488117
+SimpleITK Imaris extensions,"[SimpleITK](https://www.simpleitk.org) based extensions for the imaris (Oxford Instruments) microscopy image analysis program. A variety of utilities including registration, channel arithmetic, virtual H&E staining and more. Extension programs can be run as standalone software without the need for the imaris software",2023,https://doi.org/10.5281/zenodo.7854018,https://github.com/niaid/imaris_extensions,Python,Apache-2.0,10.1038/s41596-021-00644-9
+CytoMAP,"CytoMAP: comprehensive platform for spatial analysis of tissues, allowing researchers to explore complex datasets structured as a csv files, with at least x-y positional data",2020,https://gitlab.com/gernerlab/cytomap,https://gitlab.com/gernerlab/cytomap,MATLAB,MIT,10.1016/j.celrep.2020.107523
