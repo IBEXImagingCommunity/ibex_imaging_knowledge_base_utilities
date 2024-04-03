@@ -195,7 +195,7 @@ class TestDictGlossary2Contrib(BaseTest):
                 "contrib.md.in",
                 "reagent_data_dict.csv",
                 "reagent_glossary.csv",
-                "c914b681cf98941d9e8f74a4fe4bd892",
+                "10783a53045a2691fb8719eaeb579eb1",
             )
         ],
     )

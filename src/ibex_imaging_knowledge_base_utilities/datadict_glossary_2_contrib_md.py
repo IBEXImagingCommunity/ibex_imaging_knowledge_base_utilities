@@ -20,6 +20,7 @@ import sys
 import pandas as pd
 import argparse
 from .argparse_types import file_path_endswith, dir_path
+from .utilities import _dataframe_2_md
 
 
 def dict_glossary_to_md(
@@ -34,13 +35,15 @@ def dict_glossary_to_md(
         fp.write(
             input_md_str.replace(
                 "{reagent_metadata_table}",
-                dict_df.to_markdown(
-                    index=False, colalign=["left"] * len(dict_df.columns)
+                _dataframe_2_md(
+                    dict_df, index=False, colalign=["left"] * len(dict_df.columns)
                 ),
             ).replace(
                 "{glossary_table}",
-                glossary_df.to_markdown(
-                    index=False, colalign=["left"] * len(glossary_df.columns)
+                _dataframe_2_md(
+                    glossary_df,
+                    index=False,
+                    colalign=["left"] * len(glossary_df.columns),
                 ),
             )
         )
