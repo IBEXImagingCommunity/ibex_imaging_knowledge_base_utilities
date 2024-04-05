@@ -27,7 +27,8 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 * data_software_csv_2_md - Utility script which converts the datasets.csv and software.csv data to the markdown file used by the site.
 
 ### Fixed
-* csv files in which a cell contained multi-paragraph text were not written correctly to markdown when using the pandas dataframe `to_markdown` method. The utilities module provides a wrapper function `_dataframe_2_md` which first replaces all newlines with the html tag `<br>` and then writes the markdown file. All additional parameters given to the method are forwarded to the pandas `to_markdown` method (an alternative option would be to decorate the pandas dataframe method).
+* csv files in which a cell contained multi-paragraph text were not written as expected to markdown when using the pandas dataframe `to_markdown` method. This is because the markdown format does not support newlines in a table cell,
+though it does work with html `<br>` tag. The utilities module provides a wrapper function `_dataframe_2_md` which first replaces all newlines with the html tag `<br>`. All additional parameters given to the method are forwarded to the pandas `to_markdown` method (an alternative option would be to decorate the pandas dataframe method).
 
 ## v0.6.0
 
