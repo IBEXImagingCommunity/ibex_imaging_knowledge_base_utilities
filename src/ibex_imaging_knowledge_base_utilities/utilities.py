@@ -39,9 +39,9 @@ def _description_2_md(description, num_words=3):
 def _dataframe_2_md(df, *args, **kwargs):
     """
     Convert a dataframe to markdown. This function addresses an issue with
-    the pandas to_markdown method. When the data frame entry contains newlines
-    '\n' characters the to_markdown method breaks the cell into multiple cells
-    which is not what we want. The workaround is to replace all '\n' characters
-    with the html tag <br>.
+    the input which will be displayed in a markdown table containing newlines.
+    A markdown table entry cannot include newlines we therefor
+    replace all '\n' characters with the html tag <br> which works with the
+    markdown table.
     """
     return df.replace("\n", "<br>", regex=True).to_markdown(*args, **kwargs)
