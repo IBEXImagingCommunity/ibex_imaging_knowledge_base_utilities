@@ -21,7 +21,7 @@ import subprocess
 import tempfile
 import argparse
 import sys
-from .argparse_types import file_path_endswith
+from ibex_imaging_knowledge_base_utilities.argparse_types import file_path_endswith
 
 """
 This script creates the publications markdown page from the publications.bib bibliography

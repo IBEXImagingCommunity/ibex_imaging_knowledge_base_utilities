@@ -20,7 +20,10 @@ import pandas as pd
 import argparse
 import sys
 import pathlib
-from .argparse_types import file_path_endswith, dir_path
+from ibex_imaging_knowledge_base_utilities.argparse_types import (
+    file_path_endswith,
+    dir_path,
+)
 import requests
 from itertools import chain
 

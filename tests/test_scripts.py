@@ -2,37 +2,37 @@ import pytest
 import pathlib
 import hashlib
 
-from ibex_imaging_knowledge_base_utilities.bib2md import bibfile2md
-from ibex_imaging_knowledge_base_utilities.zenodo_json_2_thewho_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.bib2md import bibfile2md
+from ibex_imaging_knowledge_base_utilities.md_generation.zenodo_json_2_thewho_md import (
     zenodo_creators_to_md,
 )
-from ibex_imaging_knowledge_base_utilities.datadict_glossary_2_contrib_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.datadict_glossary_2_contrib_md import (
     dict_glossary_to_md,
 )
-from ibex_imaging_knowledge_base_utilities.reagent_resources_csv_2_md_url import (
+from ibex_imaging_knowledge_base_utilities.md_generation.reagent_resources_csv_2_md_url import (
     csv_to_md_with_url,
 )
-from ibex_imaging_knowledge_base_utilities.update_index_md_stats import (
+from ibex_imaging_knowledge_base_utilities.md_generation.update_index_md_stats import (
     update_index_stats,
 )
-from ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.fluorescent_probes_csv_2_md import (
     fluorescent_probe_csv_to_md,
 )
 from ibex_imaging_knowledge_base_utilities.csv_2_supporting import (
     csv_2_supporting,
 )
-from ibex_imaging_knowledge_base_utilities.protocols_csv_2_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.protocols_csv_2_md import (
     protocols_csv_to_md,
 )
-from ibex_imaging_knowledge_base_utilities.videos_csv_2_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.videos_csv_2_md import (
     videos_csv_to_md,
 )
 
-from ibex_imaging_knowledge_base_utilities.validate_zenodo_json import (
+from ibex_imaging_knowledge_base_utilities.data_validation.validate_zenodo_json import (
     validate_zenodo_json,
 )
 
-from ibex_imaging_knowledge_base_utilities.data_software_csv_2_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.data_software_csv_2_md import (
     data_software_csv_to_md,
 )
 

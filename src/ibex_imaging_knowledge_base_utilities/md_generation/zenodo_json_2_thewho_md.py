@@ -19,7 +19,10 @@
 import sys
 import json
 import argparse
-from .argparse_types import file_path_endswith, dir_path
+from ibex_imaging_knowledge_base_utilities.argparse_types import (
+    file_path_endswith,
+    dir_path,
+)
 
 
 def zenodo_creators_to_md(template_file_path, zenodo_json_file_path, output_dir):
