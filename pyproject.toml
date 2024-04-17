@@ -39,3 +39,4 @@ videos_csv_2_md = "ibex_imaging_knowledge_base_utilities.md_generation.videos_cs
 data_software_csv_2_md = "ibex_imaging_knowledge_base_utilities.md_generation.data_software_csv_2_md:main"
 csv2supporting = "ibex_imaging_knowledge_base_utilities.csv_2_supporting:main"
 validate_zenodo_json = "ibex_imaging_knowledge_base_utilities.data_validation.validate_zenodo_json:main"
+validate_bibfile = "ibex_imaging_knowledge_base_utilities.data_validation.validate_bib:main"

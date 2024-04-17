@@ -32,6 +32,10 @@ from ibex_imaging_knowledge_base_utilities.data_validation.validate_zenodo_json 
     validate_zenodo_json,
 )
 
+from ibex_imaging_knowledge_base_utilities.data_validation.validate_bib import (
+    validate_bib_file_data,
+)
+
 from ibex_imaging_knowledge_base_utilities.md_generation.data_software_csv_2_md import (
     data_software_csv_to_md,
 )
@@ -123,7 +127,7 @@ class TestFluorescentProbesCSV2MD(BaseTest):
 class TestBib2MD(BaseTest):
     @pytest.mark.parametrize(
         "bib_file_name, csl_file_name, result_md5hash",
-        [("publications.bib", "ibex.csl", "b95a58740183fb04079027610e3d06c1")],
+        [("publications.bib", "ibex.csl", "25bef22343ba3a84b984c8c69faf95a8")],
     )
     def test_bib_2_md(self, bib_file_name, csl_file_name, result_md5hash, tmp_path):
         # Write the output using the tmp_path fixture
@@ -348,3 +352,17 @@ class TestDataSetsSoftwareCSV2MD(BaseTest):
             self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem])
             == result_md5hash
         )
+
+
+class TestBibfileValidataion(BaseTest):
+    @pytest.mark.parametrize(
+        "bibtex_file_name, result",
+        [
+            ("publications.bib", 0),
+            ("duplicate_key.bib", 1),
+            ("missing_key.bib", 1),
+            ("syntax_error.bib", 1),
+        ],
+    )
+    def test_validate_zenodo_json(self, bibtex_file_name, result):
+        assert validate_bib_file_data(self.data_path / bibtex_file_name) == result
