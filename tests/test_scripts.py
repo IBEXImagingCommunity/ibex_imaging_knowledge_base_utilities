@@ -36,6 +36,10 @@ from ibex_imaging_knowledge_base_utilities.data_validation.validate_bib import (
     validate_bib_file_data,
 )
 
+from ibex_imaging_knowledge_base_utilities.data_validation.validate_fluorescent_probes import (
+    validate_fluorescent_probes_data,
+)
+
 from ibex_imaging_knowledge_base_utilities.md_generation.data_software_csv_2_md import (
     data_software_csv_to_md,
 )
@@ -105,7 +109,7 @@ class TestFluorescentProbesCSV2MD(BaseTest):
             (
                 "fluorescent_probes.md.in",
                 "fluorescent_probes.csv",
-                "a4d6cf59f826e9a8c8b6be49dcfbe5e5",
+                "5c223f6b6dd3856ae74bd6b99f915c8a",
             )
         ],
     )
@@ -116,7 +120,7 @@ class TestFluorescentProbesCSV2MD(BaseTest):
         fluorescent_probe_csv_to_md(
             template_file_path=self.data_path / md_template_file_name,
             csv_file_path=self.data_path / csv_file_name,
-            output_dir=tmp_path,
+            output_dir=output_dir,
         )
         assert (
             self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem])
@@ -364,5 +368,21 @@ class TestBibfileValidataion(BaseTest):
             ("syntax_error.bib", 1),
         ],
     )
-    def test_validate_zenodo_json(self, bibtex_file_name, result):
+    def test_validate_bibfile(self, bibtex_file_name, result):
         assert validate_bib_file_data(self.data_path / bibtex_file_name) == result
+
+
+class TestFluorescentProbesValidataion(BaseTest):
+    @pytest.mark.parametrize(
+        "probes_file_name, result",
+        [
+            ("fluorescent_probes.csv", 0),
+            ("fluorescent_probes_duplicates.csv", 1),
+            ("fluorescent_probes_leading_trailing_whitespace.csv", 1),
+        ],
+    )
+    def test_validate_fluorescent_probes(self, probes_file_name, result):
+        assert (
+            validate_fluorescent_probes_data(self.data_path / probes_file_name)
+            == result
+        )

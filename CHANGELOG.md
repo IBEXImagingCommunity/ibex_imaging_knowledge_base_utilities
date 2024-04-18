@@ -22,6 +22,7 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 ## Unreleased
 ### Added
 * validate_bibfile - Validation script which checks that the bibliography file is valid (duplicate citation keys, syntax errors). Beyond general validity it enforces some knowlege-base specific requirements (doi, and note fields are required though in most contexts they are optional).
+* validate_fluorescent_probes - Validation script which checks that the fluorescent_probes.csv file is valid (no duplicate probes and no leading or trailing whitespace in any of the entries).
 
 ## v0.7.0
 
