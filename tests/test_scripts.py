@@ -36,9 +36,7 @@ from ibex_imaging_knowledge_base_utilities.data_validation.validate_bib import (
     validate_bib_file_data,
 )
 
-from ibex_imaging_knowledge_base_utilities.data_validation.validate_fluorescent_probes import (
-    validate_fluorescent_probes_data,
-)
+import ibex_imaging_knowledge_base_utilities.data_validation.validate_basic as vbasic
 
 from ibex_imaging_knowledge_base_utilities.md_generation.data_software_csv_2_md import (
     data_software_csv_to_md,
@@ -372,17 +370,23 @@ class TestBibfileValidataion(BaseTest):
         assert validate_bib_file_data(self.data_path / bibtex_file_name) == result
 
 
-class TestFluorescentProbesValidataion(BaseTest):
+class TestBasicValidation(BaseTest):
     @pytest.mark.parametrize(
-        "probes_file_name, result",
+        "json_config, input_csv, result",
         [
-            ("fluorescent_probes.csv", 0),
-            ("fluorescent_probes_duplicates.csv", 1),
-            ("fluorescent_probes_leading_trailing_whitespace.csv", 1),
+            ("fluorescent_probes.json", "fluorescent_probes.csv", 0),
+            ("fluorescent_probes.json", "fluorescent_probes_duplicates.csv", 1),
+            (
+                "fluorescent_probes.json",
+                "fluorescent_probes_leading_trailing_whitespace.csv",
+                1,
+            ),
         ],
     )
-    def test_validate_fluorescent_probes(self, probes_file_name, result):
+    def test_validate_basic(self, json_config, input_csv, result):
         assert (
-            validate_fluorescent_probes_data(self.data_path / probes_file_name)
+            vbasic.main(
+                [str(self.data_path / input_csv), str(self.data_path / json_config)]
+            )
             == result
         )

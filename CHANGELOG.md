@@ -22,7 +22,16 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 ## Unreleased
 ### Added
 * validate_bibfile - Validation script which checks that the bibliography file is valid (duplicate citation keys, syntax errors). Beyond general validity it enforces some knowlege-base specific requirements (doi, and note fields are required though in most contexts they are optional).
-* validate_fluorescent_probes - Validation script which checks that the fluorescent_probes.csv file is valid (no duplicate probes and no leading or trailing whitespace in any of the entries).
+* validate_basic - Basic validation script for csv files. The script is configured via a json file containing the following dictionary:
+  * data_required_column_names - Columns that cannot contain empty entries.
+  * data_optional_column_names - Columns that may contain empty entries. Together with the data_required_column_names these list all of the expected column names.
+  * unique_entry_columns - columns that cannot contain duplicates.
+  * url_columns - columns containing a single url. Check for existence, no 404.
+  * multi_url_columns - columns containing multiple urls per column with semicolon separating between them. Check for existence, no 404.
+  * doi_columns - columns containing a single DOI (URL is constructed as `https://doi.org/{doi}`). Check for existence, no 404.
+  * multi_doi_columns - columns containing multiple DOIs separated by semicolons (URL is constructed as `https://doi.org/{doi}`). Check for existence, no 404.
+  * column_is_in - columns containing a single entry that has to be in the specified set of values.
+  * multi_value_column_is_in - columns containing multiple entries separated by semicolons that have to be in the specified set of values.
 
 ## v0.7.0
 
