@@ -37,6 +37,7 @@ from ibex_imaging_knowledge_base_utilities.data_validation.validate_bib import (
 )
 
 import ibex_imaging_knowledge_base_utilities.data_validation.validate_basic as vbasic
+import ibex_imaging_knowledge_base_utilities.data_validation.validate_videos as vvideos
 
 from ibex_imaging_knowledge_base_utilities.md_generation.data_software_csv_2_md import (
     data_software_csv_to_md,
@@ -304,8 +305,8 @@ class TestVideosCSV2MD(BaseTest):
             (
                 "videos.md.in",
                 "videos.csv",
-                "b13fe2c14df546221b8f64302db8a300",
-            )
+                "9aa31d29c6682b43c4c27aed856cf2dd",
+            ),
         ],
     )
     def test_videos_csv_to_md(
@@ -387,6 +388,27 @@ class TestBasicValidation(BaseTest):
         assert (
             vbasic.main(
                 [str(self.data_path / input_csv), str(self.data_path / json_config)]
+            )
+            == result
+        )
+
+
+class TestVideosValidation(BaseTest):
+    @pytest.mark.parametrize(
+        "json_config, zenodo_json, input_csv, result",
+        [
+            ("videos.json", "zenodo.json", "videos.csv", 0),
+            ("videos.json", "zenodo.json", "videos_with_unexpected_orcid.csv", 1),
+        ],
+    )
+    def test_validate_videos(self, json_config, zenodo_json, input_csv, result):
+        assert (
+            vvideos.main(
+                [
+                    str(self.data_path / input_csv),
+                    str(self.data_path / json_config),
+                    str(self.data_path / zenodo_json),
+                ]
             )
             == result
         )
