@@ -21,7 +21,7 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
-## v0.7.0
+## v0.8.0
 
 ### Added
 * validate_reagent_resources - Validation script which checks that the reagent_resources.csv file is valid. Runs the validate_basic code followed by validation specific to the expectations from the reagent_resources.csv contents. 
