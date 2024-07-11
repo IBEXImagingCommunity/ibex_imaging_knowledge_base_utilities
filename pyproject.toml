@@ -42,3 +42,4 @@ validate_zenodo_json = "ibex_imaging_knowledge_base_utilities.data_validation.va
 validate_bibfile = "ibex_imaging_knowledge_base_utilities.data_validation.validate_bib:main"
 validate_basic = "ibex_imaging_knowledge_base_utilities.data_validation.validate_basic:main"
 validate_videos = "ibex_imaging_knowledge_base_utilities.data_validation.validate_videos:main"
+validate_image_resources = "ibex_imaging_knowledge_base_utilities.data_validation.validate_image_resources:main"
