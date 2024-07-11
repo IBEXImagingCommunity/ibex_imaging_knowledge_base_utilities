@@ -344,7 +344,7 @@ def main(argv=None):
     if argv is None:  # script was invoked from commandline
         argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
-        description="Validation of reagen_resources.csv file."
+        description="Validation of reagent_resources.csv file."
     )
     parser.add_argument(
         "csv_file",
