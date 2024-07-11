@@ -43,3 +43,4 @@ validate_bibfile = "ibex_imaging_knowledge_base_utilities.data_validation.valida
 validate_basic = "ibex_imaging_knowledge_base_utilities.data_validation.validate_basic:main"
 validate_videos = "ibex_imaging_knowledge_base_utilities.data_validation.validate_videos:main"
 validate_image_resources = "ibex_imaging_knowledge_base_utilities.data_validation.validate_image_resources:main"
+validate_reagent_resources = "ibex_imaging_knowledge_base_utilities.data_validation.validate_reagent_resources:main"
