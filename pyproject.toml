@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ibex_imaging_knowledge_base_utilities"
-version = "0.7.0"
+version = "0.8.0"
 authors = [{ name="Ziv Yaniv", email="zivyaniv@nih.gov" },
 ]
 description = "Utility scripts used for managing the IBEX Imaging Community Knowledge-Base"
@@ -28,14 +28,19 @@ dependencies = [
 "Bug Tracker" = "https://github.com/IBEXImagingCommunity/ibex_imaging_knowledge_base_utilities/issues"
 
 [project.scripts]
-bib2md = "ibex_imaging_knowledge_base_utilities.bib2md:main"
-reagent_resources_csv_2_md_url = "ibex_imaging_knowledge_base_utilities.reagent_resources_csv_2_md_url:main"
-fluorescent_probes_csv_2_md = "ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md:main"
-update_index_md_stats = "ibex_imaging_knowledge_base_utilities.update_index_md_stats:main"
-data_dict_glossary_2_contrib_md = "ibex_imaging_knowledge_base_utilities.datadict_glossary_2_contrib_md:main"
-zenodo_json_2_thewho_md = "ibex_imaging_knowledge_base_utilities.zenodo_json_2_thewho_md:main"
-protocols_csv_2_md = "ibex_imaging_knowledge_base_utilities.protocols_csv_2_md:main"
-videos_csv_2_md = "ibex_imaging_knowledge_base_utilities.videos_csv_2_md:main"
-data_software_csv_2_md = "ibex_imaging_knowledge_base_utilities.data_software_csv_2_md:main"
+bib2md = "ibex_imaging_knowledge_base_utilities.md_generation.bib2md:main"
+reagent_resources_csv_2_md_url = "ibex_imaging_knowledge_base_utilities.md_generation.reagent_resources_csv_2_md_url:main"
+fluorescent_probes_csv_2_md = "ibex_imaging_knowledge_base_utilities.md_generation.fluorescent_probes_csv_2_md:main"
+update_index_md_stats = "ibex_imaging_knowledge_base_utilities.md_generation.update_index_md_stats:main"
+data_dict_glossary_2_contrib_md = "ibex_imaging_knowledge_base_utilities.md_generation.datadict_glossary_2_contrib_md:main"
+zenodo_json_2_thewho_md = "ibex_imaging_knowledge_base_utilities.md_generation.zenodo_json_2_thewho_md:main"
+protocols_csv_2_md = "ibex_imaging_knowledge_base_utilities.md_generation.protocols_csv_2_md:main"
+videos_csv_2_md = "ibex_imaging_knowledge_base_utilities.md_generation.videos_csv_2_md:main"
+data_software_csv_2_md = "ibex_imaging_knowledge_base_utilities.md_generation.data_software_csv_2_md:main"
 csv2supporting = "ibex_imaging_knowledge_base_utilities.csv_2_supporting:main"
-validate_zenodo_json = "ibex_imaging_knowledge_base_utilities.validate_zenodo_json:main"
+validate_zenodo_json = "ibex_imaging_knowledge_base_utilities.data_validation.validate_zenodo_json:main"
+validate_bibfile = "ibex_imaging_knowledge_base_utilities.data_validation.validate_bib:main"
+validate_basic = "ibex_imaging_knowledge_base_utilities.data_validation.validate_basic:main"
+validate_videos = "ibex_imaging_knowledge_base_utilities.data_validation.validate_videos:main"
+validate_image_resources = "ibex_imaging_knowledge_base_utilities.data_validation.validate_image_resources:main"
+validate_reagent_resources = "ibex_imaging_knowledge_base_utilities.data_validation.validate_reagent_resources:main"

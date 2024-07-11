@@ -21,14 +21,31 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v0.8.0
+
+### Added
+* validate_reagent_resources - Validation script which checks that the reagent_resources.csv file is valid. Runs the validate_basic code followed by validation specific to the expectations from the reagent_resources.csv contents. 
+* validate_image_resources - Validation script which checks that the image_resources.csv file is valid (runs the validate_basic code) and that the corresponding images found in the supporting_material directory of the Knowledge-Base are not corrupt (compare the md5 hash listed in the csv file to the md5 hash of the image file on disk).
+* validate_videos - Validation script which checks that the videos.csv file is valid. Performs basic validation after obtaining the ORCIDs from the .zenodo.json file to ensure that the contributors listed in the csv file are listed in the zenodo config file. This ensures that we give credit where it is due.
+* validate_bibfile - Validation script which checks that the bibliography file is valid (duplicate citation keys, syntax errors). Beyond general validity it enforces some Knowlege-Base specific requirements (doi, and note fields are required though in most contexts they are optional).
+* validate_basic - Basic validation script for csv files. The script is configured via a json file containing the following dictionary:
+  * data_required_column_names - Columns that cannot contain empty entries.
+  * data_optional_column_names - Columns that may contain empty entries. Together with the data_required_column_names these list all of the expected column names.
+  * unique_entry_columns - columns that cannot contain duplicates.
+  * url_columns - columns containing a single url. Check for existence, no 404.
+  * multi_url_columns - columns containing multiple urls per column with semicolon separating between them. Check for existence, no 404.
+  * doi_columns - columns containing a single DOI (URL is constructed as `https://doi.org/{doi}`). Check for existence, no 404.
+  * multi_doi_columns - columns containing multiple DOIs separated by semicolons (URL is constructed as `https://doi.org/{doi}`). Check for existence, no 404.
+  * column_is_in - columns containing a single entry that has to be in the specified set of values.
+  * multi_value_column_is_in - columns containing multiple entries separated by semicolons that have to be in the specified set of values.
+
 ## v0.7.0
 
 ### Added
 * data_software_csv_2_md - Utility script which converts the datasets.csv and software.csv data to the markdown file used by the site.
 
 ### Fixed
-* csv files in which a cell contained multi-paragraph text were not written as expected to markdown when using the pandas dataframe `to_markdown` method. This is because the markdown format does not support newlines in a table cell,
-though it does work with html `<br>` tag. The utilities module provides a wrapper function `_dataframe_2_md` which first replaces all newlines with the html tag `<br>`. All additional parameters given to the method are forwarded to the pandas `to_markdown` method (an alternative option would be to decorate the pandas dataframe method).
+* csv files in which a cell contained multi-paragraph text were not written as expected to markdown when using the pandas dataframe `to_markdown` method. This is because the markdown format does not support newlines in a table cell, though it does work with html `<br>` tag. The utilities module provides a wrapper function `_dataframe_2_md` which first replaces all newlines with the html tag `<br>`. All additional parameters given to the method are forwarded to the pandas `to_markdown` method (an alternative option would be to decorate the pandas dataframe method).
 
 ## v0.6.0
 

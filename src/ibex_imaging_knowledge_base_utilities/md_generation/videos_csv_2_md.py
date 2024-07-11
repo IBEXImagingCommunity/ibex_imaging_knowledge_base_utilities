@@ -19,7 +19,10 @@
 import pandas as pd
 import argparse
 import sys
-from .argparse_types import file_path_endswith, dir_path
+from ibex_imaging_knowledge_base_utilities.argparse_types import (
+    file_path_endswith,
+    dir_path,
+)
 from datetime import date
 from .utilities import _description_2_md, _dataframe_2_md
 
@@ -46,7 +49,7 @@ def videos_csv_to_md(template_file_path, csv_file_path, output_dir):
     df = pd.read_csv(csv_file_path, dtype=str, keep_default_na=False)
     # Add the hyperlink to the title column, using the string "detailed protocol"
     df["Title"] = df[["Title", "URL"]].apply(
-        lambda x: f"{x[0]} [[video]({x[1]})].", axis=1
+        lambda x: f"{x.iloc[0]} [[video]({x.iloc[1]})].", axis=1
     )
     # Convert the detailed description to markdown, with the details html markup (accordion view).
     df["Details"] = df["Details"].apply(_description_2_md)
@@ -55,7 +58,7 @@ def videos_csv_to_md(template_file_path, csv_file_path, output_dir):
     # gets rid of any leading zeros (if someone used 04 and not 4 to denote april).
     # Sort in reverse chronological order.
     df["Date"] = df[["Year", "Month", "Day"]].apply(
-        lambda x: date(int(x[0]), int(x[1]), int(x[2])), axis=1
+        lambda x: date(int(x.iloc[0]), int(x.iloc[1]), int(x.iloc[2])), axis=1
     )
     df.sort_values(by=["Date"], ascending=False, inplace=True)
     with open(template_file_path, "r") as fp:

@@ -20,7 +20,10 @@ import pandas as pd
 import argparse
 import sys
 import pathlib
-from .argparse_types import file_path_endswith, dir_path
+from ibex_imaging_knowledge_base_utilities.argparse_types import (
+    file_path_endswith,
+    dir_path,
+)
 import requests
 from itertools import chain
 
@@ -130,11 +133,11 @@ def data_to_md_str(data, supporting_material_root_dir):
         ":",
         "&",
     ]
-    if data[0].strip() == "NA":
+    if data.iloc[0].strip() == "NA":
         urls_str = "NA"
     else:
         urls_str = ""
-        txt = [v.strip() for v in data[0].split(";") if v.strip() != ""]
+        txt = [v.strip() for v in data.iloc[0].split(";") if v.strip() != ""]
         for v in txt[0:-1]:
             # Replace spaces, slashes and brackets with underscores assume that the
             # file exists, data validation happens prior to conversion of data to markdown.
@@ -145,7 +148,7 @@ def data_to_md_str(data, supporting_material_root_dir):
             )
             urls_str += f"[{v}]({supporting_material_root_dir}/{tc_subpath}/{v}.md), "
         tc_subpath = replace_char_list(
-            input_str=f"{data[1]}_{data[2]}",
+            input_str=f"{data.iloc[1]}_{data.iloc[2]}",
             change_chars_list=invalid_chars,
             replacement_char="_",
         )

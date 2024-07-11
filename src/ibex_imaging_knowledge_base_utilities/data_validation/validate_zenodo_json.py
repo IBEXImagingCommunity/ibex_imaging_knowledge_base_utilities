@@ -19,8 +19,8 @@
 import sys
 import json
 import argparse
-from .argparse_types import file_path_endswith
-from .url_exists import check_urls
+from ibex_imaging_knowledge_base_utilities.argparse_types import file_path_endswith
+from .utilities import check_urls
 
 """
 This script validates the contents of the .zenodo.json file:

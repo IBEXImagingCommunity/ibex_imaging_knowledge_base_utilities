@@ -19,7 +19,10 @@
 import pandas as pd
 import argparse
 import sys
-from .argparse_types import file_path_endswith, dir_path
+from ibex_imaging_knowledge_base_utilities.argparse_types import (
+    file_path_endswith,
+    dir_path,
+)
 
 """
 This script computes statistics from the reagent_resources.csv file and injects them into the input markdown file.

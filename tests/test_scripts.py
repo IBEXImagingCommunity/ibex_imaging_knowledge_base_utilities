@@ -2,37 +2,51 @@ import pytest
 import pathlib
 import hashlib
 
-from ibex_imaging_knowledge_base_utilities.bib2md import bibfile2md
-from ibex_imaging_knowledge_base_utilities.zenodo_json_2_thewho_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.bib2md import bibfile2md
+from ibex_imaging_knowledge_base_utilities.md_generation.zenodo_json_2_thewho_md import (
     zenodo_creators_to_md,
 )
-from ibex_imaging_knowledge_base_utilities.datadict_glossary_2_contrib_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.datadict_glossary_2_contrib_md import (
     dict_glossary_to_md,
 )
-from ibex_imaging_knowledge_base_utilities.reagent_resources_csv_2_md_url import (
+from ibex_imaging_knowledge_base_utilities.md_generation.reagent_resources_csv_2_md_url import (
     csv_to_md_with_url,
 )
-from ibex_imaging_knowledge_base_utilities.update_index_md_stats import (
+from ibex_imaging_knowledge_base_utilities.md_generation.update_index_md_stats import (
     update_index_stats,
 )
-from ibex_imaging_knowledge_base_utilities.fluorescent_probes_csv_2_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.fluorescent_probes_csv_2_md import (
     fluorescent_probe_csv_to_md,
 )
 from ibex_imaging_knowledge_base_utilities.csv_2_supporting import (
     csv_2_supporting,
 )
-from ibex_imaging_knowledge_base_utilities.protocols_csv_2_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.protocols_csv_2_md import (
     protocols_csv_to_md,
 )
-from ibex_imaging_knowledge_base_utilities.videos_csv_2_md import (
+from ibex_imaging_knowledge_base_utilities.md_generation.videos_csv_2_md import (
     videos_csv_to_md,
 )
 
-from ibex_imaging_knowledge_base_utilities.validate_zenodo_json import (
+from ibex_imaging_knowledge_base_utilities.data_validation.validate_zenodo_json import (
     validate_zenodo_json,
 )
 
-from ibex_imaging_knowledge_base_utilities.data_software_csv_2_md import (
+from ibex_imaging_knowledge_base_utilities.data_validation.validate_bib import (
+    validate_bib_file_data,
+)
+
+import ibex_imaging_knowledge_base_utilities.data_validation.validate_basic as vbasic
+
+import ibex_imaging_knowledge_base_utilities.data_validation.validate_videos as vvideos
+
+from ibex_imaging_knowledge_base_utilities.data_validation.validate_image_resources import (
+    validate_image_resources,
+)
+from ibex_imaging_knowledge_base_utilities.data_validation.validate_reagent_resources import (
+    validate_reagent_resources,
+)
+from ibex_imaging_knowledge_base_utilities.md_generation.data_software_csv_2_md import (
     data_software_csv_to_md,
 )
 
@@ -69,7 +83,7 @@ class TestCSV2MD(BaseTest):
                 "reagent_resources.csv",
                 "supporting_material",
                 "vendors_and_urls.csv",
-                "eaaff9000872870cfd0712ecc372f622",
+                "d21f1ab0c2aeb798a4ee4703871c803d",
             )
         ],
     )
@@ -101,7 +115,7 @@ class TestFluorescentProbesCSV2MD(BaseTest):
             (
                 "fluorescent_probes.md.in",
                 "fluorescent_probes.csv",
-                "a4d6cf59f826e9a8c8b6be49dcfbe5e5",
+                "5c223f6b6dd3856ae74bd6b99f915c8a",
             )
         ],
     )
@@ -112,7 +126,7 @@ class TestFluorescentProbesCSV2MD(BaseTest):
         fluorescent_probe_csv_to_md(
             template_file_path=self.data_path / md_template_file_name,
             csv_file_path=self.data_path / csv_file_name,
-            output_dir=tmp_path,
+            output_dir=output_dir,
         )
         assert (
             self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem])
@@ -123,7 +137,7 @@ class TestFluorescentProbesCSV2MD(BaseTest):
 class TestBib2MD(BaseTest):
     @pytest.mark.parametrize(
         "bib_file_name, csl_file_name, result_md5hash",
-        [("publications.bib", "ibex.csl", "b95a58740183fb04079027610e3d06c1")],
+        [("publications.bib", "ibex.csl", "25bef22343ba3a84b984c8c69faf95a8")],
     )
     def test_bib_2_md(self, bib_file_name, csl_file_name, result_md5hash, tmp_path):
         # Write the output using the tmp_path fixture
@@ -139,7 +153,7 @@ class TestBib2MD(BaseTest):
 class TestUpdateIndexMDStats(BaseTest):
     @pytest.mark.parametrize(
         "input_md_file_name, csv_file_name, result_md5hash",
-        [("index.md.in", "reagent_resources.csv", "776c99aec2968209d2e351e63e6b325a")],
+        [("index.md.in", "reagent_resources.csv", "590ea41070c761836f96c87442e29fc6")],
     )
     def test_update_index_stats(
         self, input_md_file_name, csv_file_name, result_md5hash, tmp_path
@@ -298,8 +312,8 @@ class TestVideosCSV2MD(BaseTest):
             (
                 "videos.md.in",
                 "videos.csv",
-                "b13fe2c14df546221b8f64302db8a300",
-            )
+                "9aa31d29c6682b43c4c27aed856cf2dd",
+            ),
         ],
     )
     def test_videos_csv_to_md(
@@ -347,4 +361,114 @@ class TestDataSetsSoftwareCSV2MD(BaseTest):
         assert (
             self.files_md5([output_dir / pathlib.Path(md_template_file_name).stem])
             == result_md5hash
+        )
+
+
+class TestBibfileValidataion(BaseTest):
+    @pytest.mark.parametrize(
+        "bibtex_file_name, result",
+        [
+            ("publications.bib", 0),
+            ("duplicate_key.bib", 1),
+            ("missing_key.bib", 1),
+            ("syntax_error.bib", 1),
+        ],
+    )
+    def test_validate_bibfile(self, bibtex_file_name, result):
+        assert validate_bib_file_data(self.data_path / bibtex_file_name) == result
+
+
+class TestBasicValidation(BaseTest):
+    @pytest.mark.parametrize(
+        "json_config, input_csv, result",
+        [
+            ("fluorescent_probes.json", "fluorescent_probes.csv", 0),
+            ("fluorescent_probes.json", "fluorescent_probes_duplicates.csv", 1),
+            (
+                "fluorescent_probes.json",
+                "fluorescent_probes_leading_trailing_whitespace.csv",
+                1,
+            ),
+        ],
+    )
+    def test_validate_basic(self, json_config, input_csv, result):
+        assert (
+            vbasic.main(
+                [str(self.data_path / input_csv), str(self.data_path / json_config)]
+            )
+            == result
+        )
+
+
+class TestVideosValidation(BaseTest):
+    @pytest.mark.parametrize(
+        "json_config, zenodo_json, input_csv, result",
+        [
+            ("videos.json", "zenodo.json", "videos.csv", 0),
+            ("videos.json", "zenodo.json", "videos_with_unexpected_orcid.csv", 1),
+        ],
+    )
+    def test_validate_videos(self, json_config, zenodo_json, input_csv, result):
+        assert (
+            vvideos.main(
+                [
+                    str(self.data_path / input_csv),
+                    str(self.data_path / json_config),
+                    str(self.data_path / zenodo_json),
+                ]
+            )
+            == result
+        )
+
+
+class TestImageResourcesValidation(BaseTest):
+    @pytest.mark.parametrize(
+        "json_config, input_csv, supporting_material_root_dir, result",
+        [
+            ("image_resources.json", "image_resources.csv", "supporting_material", 0),
+            (
+                "image_resources.json",
+                "image_resources_partial.csv",
+                "supporting_material",
+                1,
+            ),
+        ],
+    )
+    def test_validate_image_resources(
+        self, json_config, input_csv, supporting_material_root_dir, result
+    ):
+        assert (
+            validate_image_resources(
+                str(self.data_path / input_csv),
+                str(self.data_path / json_config),
+                str(self.data_path / supporting_material_root_dir),
+            )
+            == result
+        )
+
+
+class TestReagentResourcesValidation(BaseTest):
+    @pytest.mark.parametrize(
+        "json_config, input_csv, zenodo_json, supporting_material_root_dir, result",
+        [
+            (
+                "reagent_resources.json",
+                "reagent_resources.csv",
+                "zenodo.json",
+                "supporting_material",
+                0,
+            ),
+        ],
+    )
+    def test_validate_reagent_resources(
+        self, json_config, input_csv, zenodo_json, supporting_material_root_dir, result
+    ):
+        assert (
+            validate_reagent_resources(
+                str(self.data_path / input_csv),
+                str(self.data_path / json_config),
+                str(self.data_path / zenodo_json),
+                str(self.data_path / supporting_material_root_dir),
+            )
+            == result
         )

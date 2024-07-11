@@ -53,10 +53,10 @@ def pubs2orcid_and_number(x, pub2number):
     pubnumbers = ", ".join(
         [
             pub2number[r.strip()] if r.strip() in pub2number else ""
-            for r in x[0].split(";")
+            for r in x.iloc[0].split(";")
         ]
     )
-    orcid_str = f"[{x[1]}](https://orcid.org/{x[1]})"
+    orcid_str = f"[{x.iloc[1]}](https://orcid.org/{x.iloc[1]})"
     return orcid_str + " [" + pubnumbers + "]" if pubnumbers else orcid_str
 
 
@@ -99,8 +99,8 @@ def create_md_files(
     ]
 
     tc_rows = all_df[
-        (all_df[target_conjugate.index[0]] == target_conjugate[0])
-        & (all_df[target_conjugate.index[1]] == target_conjugate[1])
+        (all_df[target_conjugate.index[0]] == target_conjugate.iloc[0])
+        & (all_df[target_conjugate.index[1]] == target_conjugate.iloc[1])
     ]
     orcids = [
         orcid
@@ -111,7 +111,7 @@ def create_md_files(
     ]
     data_path = supporting_material_root_dir / pathlib.Path(
         replace_char_list(
-            input_str=f"{target_conjugate[0]}_{target_conjugate[1]}",
+            input_str=f"{target_conjugate.iloc[0]}_{target_conjugate.iloc[1]}",
             change_chars_list=invalid_chars,
             replacement_char="_",
         )
@@ -132,7 +132,9 @@ def create_md_files(
         notes2number = dict(
             zip(notes_list, [f"[{i}](#notes)" for i in range(1, len(notes_list) + 1)])
         )
-        configurations_table["Notes"].replace(notes2number, inplace=True)
+        configurations_table["Notes"] = configurations_table["Notes"].replace(
+            notes2number
+        )
 
         actual_publications = set(
             [
@@ -208,7 +210,7 @@ def csv_2_supporting(csv_file, supporting_material_root_dir, supporting_template
         )
 
     # Check that dataframe does not contain preceding or trailing whitespace in entries
-    df_stripped_whitespace = df.applymap(lambda x: x.strip(), na_action="ignore")
+    df_stripped_whitespace = df.map(lambda x: x.strip(), na_action="ignore")
     diff_entries = np.where(
         (df != df_stripped_whitespace)
         & ~(df.isnull() & df_stripped_whitespace.isnull())

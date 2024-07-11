@@ -56,6 +56,11 @@ jobs:
         videos_csv_2_md -h
         csv2supporting -h
         validate_zenodo_json -h
+        validate_bibfile -h
+        validate_basic -h
+        validate_videos -h
+        validate_image_resources -h
+        validate_reagent_resources -h
         data_software_csv_2_md -h
         python -m pytest -v --tb=short
     - name: Upload wheels
