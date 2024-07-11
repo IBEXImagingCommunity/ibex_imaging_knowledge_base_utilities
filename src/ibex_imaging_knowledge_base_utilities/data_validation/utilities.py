@@ -266,7 +266,7 @@ def validate_df(
         return 1
 
     # check for leading/trailing whitespace in dataframe entries
-    leading_trailing = df.applymap(lambda x: x != x.strip())
+    leading_trailing = df.map(lambda x: x != x.strip())
     leading_trailing_rows = df.index[leading_trailing.any(axis=1)].to_list()
     if leading_trailing_rows:
         print(

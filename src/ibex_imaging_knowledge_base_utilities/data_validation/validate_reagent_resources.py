@@ -90,7 +90,7 @@ def validate_reagent_resources(
     all_duplicates = raw_df[raw_df.duplicated(keep=False)]
     duplicated_indexes = all_duplicates.groupby(
         list(all_duplicates), group_keys=True
-    ).apply(lambda x: tuple(x.index))
+    ).apply(lambda x: tuple(x.index), include_groups=False)
     if not duplicated_indexes.empty:
         duplicated_indexes = [
             [i + shift_index for i in indexes] for indexes in duplicated_indexes
@@ -112,7 +112,7 @@ def validate_reagent_resources(
     )
     problem_row_indexes = df.index[
         df[["Contributor", "Agree", "Disagree"]].apply(
-            lambda x: not (x[0] in x[1] + x[2]), axis=1
+            lambda x: not (x.iloc[0] in x.iloc[1] + x.iloc[2]), axis=1
         )
     ]
     if not problem_row_indexes.empty:
@@ -125,7 +125,8 @@ def validate_reagent_resources(
     # Check that the number of ORCIDs in the Agree and Disagree columns is equal/less than MAX_ORCID_ENTRIES
     problem_row_indexes = df.index[
         df[["Agree", "Disagree"]].apply(
-            lambda x: len(x[0]) > MAX_ORCID_ENTRIES or len(x[1]) > MAX_ORCID_ENTRIES,
+            lambda x: len(x.iloc[0]) > MAX_ORCID_ENTRIES
+            or len(x.iloc[1]) > MAX_ORCID_ENTRIES,
             axis=1,
         )
     ]
@@ -140,7 +141,7 @@ def validate_reagent_resources(
     # Check that the same ORCID does not appear both in the Agree and Disagree columns
     problem_row_indexes = df.index[
         df[["Agree", "Disagree"]].apply(
-            lambda x: bool(set(x[0]).intersection(x[1])), axis=1
+            lambda x: bool(set(x.iloc[0]).intersection(x.iloc[1])), axis=1
         )
     ]
     if not problem_row_indexes.empty:
@@ -232,8 +233,8 @@ def validate_supporting_material(
     status = 0
     # The target_conjugate.index contains the column names
     tc_rows = all_df[
-        (all_df[target_conjugate.index[0]] == target_conjugate[0])
-        & (all_df[target_conjugate.index[1]] == target_conjugate[1])
+        (all_df[target_conjugate.index[0]] == target_conjugate.iloc[0])
+        & (all_df[target_conjugate.index[1]] == target_conjugate.iloc[1])
     ]
     # Get all the orcids associated with this target_conjugate pair
     orcids = set().union(*(pd.concat([tc_rows["Agree"], tc_rows["Disagree"]])))
@@ -242,7 +243,7 @@ def validate_supporting_material(
 
     data_path = supporting_material_root_dir / pathlib.Path(
         replace_char_list(
-            input_str=f"{target_conjugate[0]}_{target_conjugate[1]}",
+            input_str=f"{target_conjugate.iloc[0]}_{target_conjugate.iloc[1]}",
             change_chars_list=invalid_chars,
             replacement_char="_",
         )

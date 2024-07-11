@@ -80,7 +80,7 @@ def validate_image_resources(
     # Get all the files where the hash recorded in the image resources file differs from the actual file hash
     problematic_files = df["file"][
         df[["file_full_path", "md5"]].apply(
-            lambda x: md5sum(x[0]) != x[1],
+            lambda x: md5sum(x.iloc[0]) != x.iloc[1],
             axis=1,
         )
     ]
