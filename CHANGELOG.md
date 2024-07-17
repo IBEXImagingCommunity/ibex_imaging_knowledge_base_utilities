@@ -21,6 +21,12 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v0.8.1
+
+### Fixed
+* validate_bib - incorrect argument name used in main (args.zenodo_json when it should be args.bibfile).
+* validate_image_resources - use of relative path instead of absolute path resulted in incorrect mismatches between filenames from csv and actual files on disk, changed to absolute path resolved the issue.
+
 ## v0.8.0
 
 ### Added
