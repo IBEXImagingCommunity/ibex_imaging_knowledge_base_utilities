@@ -93,7 +93,7 @@ def main(argv=None):
     )
     args = parser.parse_args(argv)
 
-    return validate_bib_file_data(args.zenodo_json)
+    return validate_bib_file_data(args.bibfile)
 
 
 if __name__ == "__main__":

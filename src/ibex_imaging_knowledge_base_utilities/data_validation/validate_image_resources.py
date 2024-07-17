@@ -57,7 +57,7 @@ def validate_image_resources(
     # Get series with full path to image files, assume there is no column titled file_full_path
     # in the original data frame
     df["file_full_path"] = df["file"].apply(
-        lambda x: os.path.join(supporting_material_root_dir, x)
+        lambda x: os.path.join(os.path.abspath(supporting_material_root_dir), x)
     )
 
     # Display long file paths when printing series which
