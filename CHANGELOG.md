@@ -21,6 +21,11 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v0.8.2
+
+### Changed
+* validate_image_resources - Check that the vendor listed in the reagent_resources.csv is from the list of vendors found in the vendor_urls.csv.
+
 ## v0.8.1
 
 ### Fixed

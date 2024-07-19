@@ -449,25 +449,33 @@ class TestImageResourcesValidation(BaseTest):
 
 class TestReagentResourcesValidation(BaseTest):
     @pytest.mark.parametrize(
-        "json_config, input_csv, zenodo_json, supporting_material_root_dir, result",
+        "json_config, input_csv, zenodo_json, vendor_csv, supporting_material_root_dir, result",
         [
             (
                 "reagent_resources.json",
                 "reagent_resources.csv",
                 "zenodo.json",
+                "vendors_and_urls.csv",
                 "supporting_material",
                 0,
             ),
         ],
     )
     def test_validate_reagent_resources(
-        self, json_config, input_csv, zenodo_json, supporting_material_root_dir, result
+        self,
+        json_config,
+        input_csv,
+        zenodo_json,
+        vendor_csv,
+        supporting_material_root_dir,
+        result,
     ):
         assert (
             validate_reagent_resources(
                 str(self.data_path / input_csv),
                 str(self.data_path / json_config),
                 str(self.data_path / zenodo_json),
+                str(self.data_path / vendor_csv),
                 str(self.data_path / supporting_material_root_dir),
             )
             == result

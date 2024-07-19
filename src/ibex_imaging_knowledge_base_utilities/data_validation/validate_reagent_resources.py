@@ -25,6 +25,7 @@ import re
 from ibex_imaging_knowledge_base_utilities.argparse_types import (
     file_path_endswith,
     dir_path,
+    csv_path,
 )
 from .utilities import validate_df
 
@@ -47,6 +48,7 @@ def validate_reagent_resources(
     csv_file_name,
     json_config_file_name,
     zenodo_json_file_name,
+    vendors_csv_file_name,
     supporting_material_root_dir,
 ):
     MAX_ORCID_ENTRIES = 5
@@ -66,10 +68,18 @@ def validate_reagent_resources(
         zenodo_dict = json.load(fp)
     orcids = [data["orcid"].strip() for data in zenodo_dict["creators"]] + ["NA"]
 
+    # Get the list of vendor names from the vendor_urls.csv file name, column
+    # titled "Vendor"
+    vendor_names = pd.read_csv(vendors_csv_file_name)["Vendor"].to_list()
+
+    # Add the ORCIDs and vendor names to the configuration dictionary to
+    # enforce column content to be in a set of values
     if "column_is_in" in configuration_dict:
         configuration_dict["column_is_in"]["Contributor"] = orcids
+        configuration_dict["column_is_in"]["Vendor"] = vendor_names
     else:
         configuration_dict["column_is_in"] = {"Contributor": orcids}
+        configuration_dict["column_is_in"] = {"Vendor": vendor_names}
 
     if "multi_value_column_is_in" in configuration_dict:
         configuration_dict["multi_value_column_is_in"]["Agree"] = orcids
@@ -101,7 +111,7 @@ def validate_reagent_resources(
     # Check that the Contributor ORCID appears in the Agree or Disagree column.
     # In most cases it will be in the Agree column. When the recommendation
     # is refuted (multiple validators disagreed with the original contributor)
-    # and changed to from Yes to No or vice versa the ORCIDs from the Agree and
+    # and changed from Yes to No or vice versa the ORCIDs from the Agree and
     # Disagree columns are swapped and the original contributors ORCID will appear
     # in the Disagree column.
     df["Agree"] = df["Agree"].apply(
@@ -159,7 +169,7 @@ def validate_reagent_resources(
     unique_target_conjugate = df[
         ["Target Name / Protein Biomarker", "Conjugate"]
     ].drop_duplicates()
-    # md_file_paths_from_csv, status = unique_target_conjugate.apply(
+
     res = unique_target_conjugate.apply(
         lambda target_conjugate: validate_supporting_material(
             target_conjugate, df, supporting_material_root_dir
@@ -314,10 +324,10 @@ def validate_supporting_material(
             ] = supporting_orcid_configurations["Disagree"].apply(
                 lambda x: frozenset([s[1:-1] for s in re.findall(orcid_pattern, x)])
             )
-            supporting_orcid_configurations[
-                "Contributor"
-            ] = supporting_orcid_configurations["Contributor"].apply(
-                lambda x: re.findall(orcid_pattern, x)[0][1:-1]
+            supporting_orcid_configurations["Contributor"] = (
+                supporting_orcid_configurations["Contributor"].apply(
+                    lambda x: re.findall(orcid_pattern, x)[0][1:-1]
+                )
             )
             # Compare the configuration data from the supporting material to that from the reagent_resources file.
             # We don't use DataFrame.equal because that assumes the order of the columns and indexes is the same,
@@ -363,6 +373,11 @@ def main(argv=None):
         help=".zenodo.json file which contains the ORCIDs of all contributors.",
     )
     parser.add_argument(
+        "vendors_csv_file",
+        type=lambda x: csv_path(x, required_columns={"Vendor"}),
+        help="csv file containing all valid vendor names in a column titled 'Vendor'.",
+    )
+    parser.add_argument(
         "supporting_material_root_dir",
         type=dir_path,
         help="Path to supporting material root directory.",
@@ -373,6 +388,7 @@ def main(argv=None):
         args.csv_file,
         args.json_config_file,
         args.zenodo_json_file,
+        args.vendors_csv_file,
         args.supporting_material_root_dir,
     )
 
