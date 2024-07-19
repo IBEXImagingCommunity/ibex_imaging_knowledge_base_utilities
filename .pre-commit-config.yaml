@@ -15,7 +15,7 @@ repos:
    - id: check-json
    - id: check-yaml
 - repo: https://github.com/psf/black
-  rev: 22.12.0
+  rev: 24.4.2
   hooks: # check conformance to black formatting
    - id: black 
      args: ['--check'] # if run without arguments, will fail and will format the files
