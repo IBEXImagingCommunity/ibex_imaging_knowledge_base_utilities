@@ -142,7 +142,7 @@ def data_to_md_str(data, supporting_material_root_dir):
             # Replace spaces, slashes and brackets with underscores assume that the
             # file exists, data validation happens prior to conversion of data to markdown.
             tc_subpath = replace_char_list(
-                input_str=f"{data[1]}_{data[2]}",
+                input_str=f"{data.iloc[1]}_{data.iloc[2]}",
                 change_chars_list=invalid_chars,
                 replacement_char="_",
             )
