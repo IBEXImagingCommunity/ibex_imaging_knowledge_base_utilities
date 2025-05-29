@@ -80,7 +80,7 @@ class TestCSV2MD(BaseTest):
                 "reagent_resources.csv",
                 "supporting_material",
                 "vendors_and_urls.csv",
-                "d21f1ab0c2aeb798a4ee4703871c803d",
+                "612ec9d57ef4622f011628476e59a5e7",
             )
         ],
     )

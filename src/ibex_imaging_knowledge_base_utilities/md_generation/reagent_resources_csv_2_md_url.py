@@ -47,8 +47,10 @@ web page to confirm existence. If the response is not as expected a warning is p
 used. We take this approach because some sites are set up to prevent robot scraping and denial of service
 attacks making it more complex to check if the URL exists.
 
-The resulting markdown file "reagent_resources.md" is written to the parent directory of the supporting
-material.
+Finally, when there are images associated with an entry, the script adds hyperlinks between the image caption
+and image files in the supporting material directory.
+
+The resulting markdown file is written to the parent directory of the supporting material directory.
 
 This script is automatically run when modifications to the reagent_resources.csv file are merged
 into the main branch of the ibex_knowledge_base repository (see .github/workflows/main.yml).
@@ -72,6 +74,13 @@ request_headers = {
 
 
 def csv_to_md_str_dict(csv_file_path):
+    """
+    Read a csv file containing columns titled "Vendor" and
+    "URL". Check that the URL is live and if not, print a warning.
+    Create the markdown string representing a link between the Vendor
+    and URL ([Vendor](URL)) and add it to a dictionary mapping between
+    the Vendor string to the Vendor markdown string.
+    """
     df = pd.read_csv(csv_file_path, dtype=str, keep_default_na=False)
     data_dict = dict(zip(df["Vendor"], df["URL"]))
     md_str_dict = {}
@@ -88,7 +97,7 @@ def csv_to_md_str_dict(csv_file_path):
                 md_str_dict[raw_text] = f"[{raw_text}]({url_target})"
             else:
                 print(
-                    "Warning: problem with {raw_text} URL ({url_target}), check link..."
+                    f"Warning: problem with {raw_text} URL ({url_target}), check link..."
                 )
                 md_str_dict[raw_text] = f"[{raw_text}]({url_target})"
         except requests.exceptions.RequestException:
@@ -98,6 +107,10 @@ def csv_to_md_str_dict(csv_file_path):
 
 
 def replace_char_list(input_str, change_chars_list, replacement_char):
+    """
+    Given an input string replace all characters listed in the change_chars_list with the
+    replacement_char (a bit more generic than the Python string's replace method).
+    """
     for c in change_chars_list:
         if c in input_str:
             input_str = input_str.replace(c, replacement_char)
@@ -158,6 +171,28 @@ def data_to_md_str(data, supporting_material_root_dir):
     return urls_str
 
 
+def image_caption_to_md_str(image_caption, supporting_material_path):
+    """
+    Given a two entry series, a string representing file paths
+    separated by semicolons and a string representing image captions, return a markdown
+    string linking between the two ([caption1](file_path1), [caption2](file_path2)...).
+    """
+    if image_caption.iloc[0].strip() == "NA":
+        md_str = "NA"
+    else:
+        md_str = ""
+        image_file_paths = [
+            v.strip() for v in image_caption.iloc[0].split(";") if v.strip() != ""
+        ]
+        captions = [
+            v.strip() for v in image_caption.iloc[1].split(";") if v.strip() != ""
+        ]
+        for file_path, caption in zip(image_file_paths[0:-1], captions[0:-1]):
+            md_str += f"[{caption}]({supporting_material_path}/{file_path}), "
+        md_str += f"[{captions[-1]}]({supporting_material_path}/{image_file_paths[-1]})"
+    return md_str
+
+
 def uniprot_to_md_str(uniprot):
     if uniprot == "NA":
         return "NA"
@@ -215,6 +250,7 @@ def csv_to_md_with_url(
         inplace=True,
         key=lambda x: x.str.lower(),
     )
+    # Get string representing last path component
     supporting_material_path = pathlib.PurePath(supporting_material_root_dir).name
     if not df.empty:
         print("Start linking to supporting material...")
@@ -224,9 +260,7 @@ def csv_to_md_with_url(
         df["Disagree"] = df[
             ["Disagree", "Target Name / Protein Biomarker", "Conjugate"]
         ].apply(
-            lambda x: data_to_md_str(
-                x, pathlib.PurePath(supporting_material_root_dir).name
-            ),
+            lambda x: data_to_md_str(x, supporting_material_path),
             axis=1,
         )
         print("Finished linking to supporting material...")
@@ -252,9 +286,18 @@ def csv_to_md_with_url(
         try:
             df["Vendor"] = df["Vendor"].apply(lambda x: vendor_to_website[x])
         except KeyError as k:
-            print(f"Vendor ({k}) not found in {vendor_to_website_csv_file_path}.")
+            print(
+                f"Vendor ({k}) not found in {vendor_to_website_csv_file_path}.",
+                file=sys.stderr,
+            )
             return 1
         print("Finished linking to vendor websites...")
+        print("Start linking to image files...")
+        df["Images"] = df[["Image Files", "Captions"]].apply(
+            lambda x: image_caption_to_md_str(x, supporting_material_path), axis=1
+        )
+        df.drop(["Image Files", "Captions", "MD5"], axis=1, inplace=True)
+        print("Finished linking to image files...")
 
     with open(template_file_path, "r") as fp:
         input_md_str = fp.read()
@@ -268,8 +311,6 @@ def csv_to_md_with_url(
 
 
 def main(argv=None):
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         description="Convert knowledge-base reagent resources file from csv to md and add hyperlinks."
     )

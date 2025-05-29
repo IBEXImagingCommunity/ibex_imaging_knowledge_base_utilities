@@ -22,12 +22,13 @@ import argparse
 import pandas as pd
 import pathlib
 import re
+import os
 from ibex_imaging_knowledge_base_utilities.argparse_types import (
     file_path_endswith,
     dir_path,
     csv_path,
 )
-from .utilities import validate_df
+from .utilities import validate_df, md5sum
 
 """
 This script validates the contents of the reagents_resources.csv file:
@@ -105,7 +106,7 @@ def validate_reagent_resources(
         duplicated_indexes = [
             [i + shift_index for i in indexes] for indexes in duplicated_indexes
         ]
-        print(f"The following rows are duplicates: {duplicated_indexes}")
+        print(f"The following rows are duplicates: {duplicated_indexes}", sys.stderr)
         return 1
 
     # Check that the Contributor ORCID appears in the Agree or Disagree column.
@@ -129,7 +130,8 @@ def validate_reagent_resources(
         problem_row_indexes = [i + shift_index for i in problem_row_indexes]
         print(
             "The 'Contributor' in the following rows does not appear in the 'Agree' or 'Disagree' columns "
-            + f"as expected: {problem_row_indexes}"
+            + f"as expected: {problem_row_indexes}",
+            file=sys.stderr,
         )
         return 1
     # Check that the number of ORCIDs in the Agree and Disagree columns is equal/less than MAX_ORCID_ENTRIES
@@ -144,7 +146,8 @@ def validate_reagent_resources(
         problem_row_indexes = [i + shift_index for i in problem_row_indexes]
         print(
             "The number of ORCIDs in either the 'Agree' or 'Disagree' column for the following rows "
-            + f"is larger than the maximal allowed ({MAX_ORCID_ENTRIES}): {problem_row_indexes}"
+            + f"is larger than the maximal allowed ({MAX_ORCID_ENTRIES}): {problem_row_indexes}",
+            file=sys.stderr,
         )
         return 1
 
@@ -160,7 +163,8 @@ def validate_reagent_resources(
         ]
         print(
             "One or more ORCIDs in the following rows appears both in the 'Agree' and 'Disagree' "
-            + f"column for the same validation: {problem_row_indexes}"
+            + f"column for the same validation: {problem_row_indexes}",
+            file=sys.stderr,
         )
         return 1
 
@@ -172,7 +176,9 @@ def validate_reagent_resources(
 
     res = unique_target_conjugate.apply(
         lambda target_conjugate: validate_supporting_material(
-            target_conjugate, df, supporting_material_root_dir
+            target_conjugate,
+            df.drop(["Image Files", "Captions", "MD5"], axis=1),
+            supporting_material_root_dir,
         ),
         axis=1,
     )
@@ -193,10 +199,18 @@ def validate_reagent_resources(
     if superfluous_md_files:
         print(
             "The following files are superfluous to those expected from the "
-            + f"reagent_resources.csv: {superfluous_md_files}"
+            + f"reagent_resources.csv: {superfluous_md_files}",
+            file=sys.stderr,
         )
         return 1
-    return 0
+
+    # Check the image information (files exits, match md5 hashes, configurations for same image
+    # match, no images in supporting material directory that aren't listed in the reagent_resource.csv)
+    return validate_images(
+        df[["Image Files", "Captions", "MD5"]],
+        supporting_material_root_dir,
+        shift_index,
+    )
 
 
 def replace_char_list(input_str, change_chars_list, replacement_char):
@@ -207,6 +221,92 @@ def replace_char_list(input_str, change_chars_list, replacement_char):
         if c in input_str:
             input_str = input_str.replace(c, replacement_char)
     return input_str
+
+
+def validate_images(df, supporting_material_root_dir, shift_index):
+    df = df.map(
+        lambda x: [] if x.strip() == "NA" else [v.strip() for v in x.split(";")]
+    )
+    supporting_material_root_dir_abspath = os.path.abspath(supporting_material_root_dir)
+    df["Image Files"] = df["Image Files"].apply(
+        lambda x: [os.path.join(supporting_material_root_dir_abspath, v) for v in x]
+    )
+    # check that number of files, captions and md5 hashes is equal per configuration/line
+    problem_rows = df.apply(
+        lambda x: (len(x.iloc[0]) != len(x.iloc[1]))
+        or (len(x.iloc[1]) != len(x.iloc[2])),
+        axis=1,
+    )
+    problem_row_indexes = problem_rows[problem_rows].index
+    if not problem_row_indexes.empty:
+        problem_row_indexes = [i + shift_index for i in problem_row_indexes]
+        print(
+            "The number of 'Image Files', 'Captions' and 'MD5' hashes is not equal "
+            + f"in the following rows: {problem_row_indexes}",
+            file=sys.stderr,
+        )
+        return 1
+
+    # Check that image files exist and match the listed md5 hash
+    missing_file_row_indexes_name = []
+    md5_mismatch_file_row_indexes_name = []
+    for i, (file_list, md5_list) in enumerate(
+        zip(df["Image Files"], df["MD5"]), start=shift_index
+    ):
+        for f, md5 in zip(file_list, md5_list):
+            if not os.path.isfile(f):
+                missing_file_row_indexes_name.append((i, f))
+            elif md5sum(f) != md5:
+                md5_mismatch_file_row_indexes_name.append((i, f))
+    if missing_file_row_indexes_name:
+        print(
+            f"The following files do not exist (row_number, file_name): {missing_file_row_indexes_name}",
+            file=sys.stderr,
+        )
+    if md5_mismatch_file_row_indexes_name:
+        print(
+            "The following files do not match the md5 hash "
+            + f"(row_number, file_name): {md5_mismatch_file_row_indexes_name}",
+            file=sys.stderr,
+        )
+    if missing_file_row_indexes_name or md5_mismatch_file_row_indexes_name:
+        return 1
+    # List of files that may be in the supporting_materials directory
+    # structure and that we should ignore when comparing to the list of
+    # images found in the reagent_resources.csv.
+    # The supporting materials directory is expected to contain markdown
+    # files with file extension ".md" and all other files are assumed to
+    # be images.
+    FILES_IGNORE = [".DS_Store"]
+
+    # Get all the non markdown file names and make sure that they match those in
+    # the image_resources.csv. The supporting material subdirectory is expected
+    # to contain markdown files and images, no other files.
+    image_file_paths_from_supporting_material_dir = []
+    for dir_name, subdir_names, file_names in os.walk(supporting_material_root_dir):
+        for file in file_names:
+            if not file.endswith(".md") and file not in FILES_IGNORE:
+                image_file_paths_from_supporting_material_dir.append(
+                    os.path.join(os.path.abspath(dir_name), file)
+                )
+    image_file_paths_from_supporting_material_dir = set(
+        image_file_paths_from_supporting_material_dir
+    )
+    all_csv_image_files = []
+    for image_file_list in df["Image Files"]:
+        all_csv_image_files.extend(image_file_list)
+    image_file_paths_from_csv = set(all_csv_image_files)
+    superfluous_image_files = image_file_paths_from_supporting_material_dir.difference(
+        image_file_paths_from_csv
+    )
+    if superfluous_image_files:
+        print(
+            "The following files are superfluous to those expected from the "
+            + f"contents of the image_resources.csv file: {superfluous_image_files}",
+            file=sys.stderr,
+        )
+        return 1
+    return 0
 
 
 def validate_supporting_material(
@@ -264,7 +364,7 @@ def validate_supporting_material(
         md_file_path = data_path / pathlib.Path(orcid + ".md")
         file_names.append(md_file_path)
         if not md_file_path.is_file():
-            print(f"{md_file_path} does not exist.")
+            print(f"{md_file_path} does not exist.", file=sys.stderr)
             status = 1
             continue  # expected file is missing, can't compare contents to the reagent_resources.csv
         orcid_configurations = tc_rows[
@@ -341,19 +441,17 @@ def validate_supporting_material(
                 != len(supporting_orcid_configurations)
             ):
                 print(
-                    f"Contents of ({md_file_path}) do not match the contents of the reagent_resources.csv"
+                    f"Contents of ({md_file_path}) do not match the contents of the reagent_resources.csv",
+                    file=sys.stderr,
                 )
                 status = 1
         except Exception as e:
-            print(f"file:{md_file_path}, exception: {e}")
+            print(f"file:{md_file_path}, exception: {e}", file=sys.stderr)
             status = 1
     return (file_names, status)
 
 
 def main(argv=None):
-
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         description="Validation of reagent_resources.csv file."
     )
