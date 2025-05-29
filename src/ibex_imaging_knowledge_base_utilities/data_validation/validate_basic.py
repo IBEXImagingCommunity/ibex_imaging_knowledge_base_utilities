@@ -48,9 +48,6 @@ specified set of values.
 
 
 def main(argv=None):
-
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(description="Basic csv file content validation.")
     parser.add_argument(
         "csv_file",

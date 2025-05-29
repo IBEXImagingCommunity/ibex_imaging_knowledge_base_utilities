@@ -81,8 +81,6 @@ def videos_csv_to_md(template_file_path, csv_file_path, output_dir):
 
 
 def main(argv=None):
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         description="Convert knowledge-base videos file from csv to md and link using URL."
     )

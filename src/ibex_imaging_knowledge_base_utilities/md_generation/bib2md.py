@@ -102,8 +102,6 @@ def bibfile2md(bib_file, citation_style_language_file, output_file):
 
 
 def main(argv=None):
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         description="Create publications markdown file from a bib file."
     )

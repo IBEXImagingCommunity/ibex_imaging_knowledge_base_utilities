@@ -53,8 +53,6 @@ def dict_glossary_to_md(
 
 
 def main(argv=None):
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         description="Insert data dictionary and glossary from csv files into the contrib instructions markdown."
     )

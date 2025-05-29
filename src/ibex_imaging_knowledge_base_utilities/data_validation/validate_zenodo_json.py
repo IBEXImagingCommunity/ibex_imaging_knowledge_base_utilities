@@ -163,8 +163,6 @@ def validate_zenodo_json(zenodo_json):
 
 
 def main(argv=None):
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(description="Validate .zenodo.json file content.")
     parser.add_argument(
         "zenodo_json",

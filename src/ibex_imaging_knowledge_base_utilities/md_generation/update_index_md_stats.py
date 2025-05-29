@@ -116,8 +116,6 @@ def compute_stats_dictionary(input_csv):
 
 
 def main(argv=None):
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(description="Update stats in the index.md file.")
     parser.add_argument(
         "md_template_file",
