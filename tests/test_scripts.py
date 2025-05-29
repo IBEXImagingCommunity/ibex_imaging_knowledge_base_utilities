@@ -40,9 +40,6 @@ import ibex_imaging_knowledge_base_utilities.data_validation.validate_basic as v
 
 import ibex_imaging_knowledge_base_utilities.data_validation.validate_videos as vvideos
 
-from ibex_imaging_knowledge_base_utilities.data_validation.validate_image_resources import (
-    validate_image_resources,
-)
 from ibex_imaging_knowledge_base_utilities.data_validation.validate_reagent_resources import (
     validate_reagent_resources,
 )
@@ -416,32 +413,6 @@ class TestVideosValidation(BaseTest):
                     str(self.data_path / json_config),
                     str(self.data_path / zenodo_json),
                 ]
-            )
-            == result
-        )
-
-
-class TestImageResourcesValidation(BaseTest):
-    @pytest.mark.parametrize(
-        "json_config, input_csv, supporting_material_root_dir, result",
-        [
-            ("image_resources.json", "image_resources.csv", "supporting_material", 0),
-            (
-                "image_resources.json",
-                "image_resources_partial.csv",
-                "supporting_material",
-                1,
-            ),
-        ],
-    )
-    def test_validate_image_resources(
-        self, json_config, input_csv, supporting_material_root_dir, result
-    ):
-        assert (
-            validate_image_resources(
-                str(self.data_path / input_csv),
-                str(self.data_path / json_config),
-                str(self.data_path / supporting_material_root_dir),
             )
             == result
         )

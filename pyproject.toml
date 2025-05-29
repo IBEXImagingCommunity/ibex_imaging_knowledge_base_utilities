@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ibex_imaging_knowledge_base_utilities"
-version = "0.8.2"
+version = "0.9.0"
 authors = [{ name="Ziv Yaniv", email="zivyaniv@nih.gov" },
 ]
 description = "Utility scripts used for managing the IBEX Imaging Community Knowledge-Base"
@@ -42,5 +42,4 @@ validate_zenodo_json = "ibex_imaging_knowledge_base_utilities.data_validation.va
 validate_bibfile = "ibex_imaging_knowledge_base_utilities.data_validation.validate_bib:main"
 validate_basic = "ibex_imaging_knowledge_base_utilities.data_validation.validate_basic:main"
 validate_videos = "ibex_imaging_knowledge_base_utilities.data_validation.validate_videos:main"
-validate_image_resources = "ibex_imaging_knowledge_base_utilities.data_validation.validate_image_resources:main"
 validate_reagent_resources = "ibex_imaging_knowledge_base_utilities.data_validation.validate_reagent_resources:main"
