@@ -239,25 +239,29 @@ class TestDictGlossary2Contrib(BaseTest):
 
 class TestCSV2Supporting(BaseTest):
     @pytest.mark.parametrize(
-        "csv_file, supporting_template_file, output_file_paths, result_md5hash",
+        "csv_file, image_dir, supporting_template_file, output_file_paths, result_md5hash",
         [
             (
                 "reagent_batch.csv",
+                "image_dir",
                 "supporting_template.md",
                 [
                     "CD106_PE/0000-0003-4379-8967.md",
                     "CD20_AF488/0000-0001-9561-4256.md",
+                    "FOXP3_eF570/0000-0003-4379-8967.md",
+                    "Glutamine_synthetase_CoraLite_Plus_AF488/0000-0003-2088-8310.md",
                     "CD20_AF488/0000-0003-4379-8967.md",
                     "Granzyme_B_Unconjugated/0000-0001-9561-4256.md",
                     "Ki-67_BV510/0000-0001-9561-4256.md",
                 ],
-                "a7406b230dce81408abc583b2db4e1a6",
+                "c3345fe77aa30a9e87ae15238729d561",
             )
         ],
     )
     def test_csv_to_supporting(
         self,
         csv_file,
+        image_dir,
         supporting_template_file,
         output_file_paths,
         result_md5hash,
@@ -267,6 +271,7 @@ class TestCSV2Supporting(BaseTest):
         output_dir = tmp_path
         csv_2_supporting(
             self.data_path / csv_file,
+            self.data_path / image_dir,
             output_dir,
             self.data_path / supporting_template_file,
         )
