@@ -40,8 +40,10 @@ This script validates the contents of the reagents_resources.csv file:
    than this number of reagent validation reproductions).
 6. Ensure that the information in the supporting material files is consistent with the content of the
    reagent_resources.csv.
-7. Ensure there are no superfluous markdown files in the supporting_material directory. These are files that are not
-   associated with information in the reagent_resources.csv, they shouldn't be there.
+7. Ensure there are no superfluous files in the supporting_material directory. These are files that are not
+   associated with information in the reagent_resources.csv, they shouldn't be there. The expected files are
+   either markdown files associated with the target_conjugate/orcid.md combination or listed image files.
+8. Ensure that the listed image files exist and are valid (match their listed md5 hash).
 """
 
 
