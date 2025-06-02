@@ -50,9 +50,6 @@ def validate_videos(csv_file_name, json_config_file_name, zenodo_json_file_name)
 
 
 def main(argv=None):
-
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(description="Validation of videos.csv file.")
     parser.add_argument(
         "csv_file",

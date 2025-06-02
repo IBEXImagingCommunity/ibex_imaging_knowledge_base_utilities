@@ -40,9 +40,6 @@ import ibex_imaging_knowledge_base_utilities.data_validation.validate_basic as v
 
 import ibex_imaging_knowledge_base_utilities.data_validation.validate_videos as vvideos
 
-from ibex_imaging_knowledge_base_utilities.data_validation.validate_image_resources import (
-    validate_image_resources,
-)
 from ibex_imaging_knowledge_base_utilities.data_validation.validate_reagent_resources import (
     validate_reagent_resources,
 )
@@ -83,7 +80,7 @@ class TestCSV2MD(BaseTest):
                 "reagent_resources.csv",
                 "supporting_material",
                 "vendors_and_urls.csv",
-                "d21f1ab0c2aeb798a4ee4703871c803d",
+                "612ec9d57ef4622f011628476e59a5e7",
             )
         ],
     )
@@ -242,25 +239,29 @@ class TestDictGlossary2Contrib(BaseTest):
 
 class TestCSV2Supporting(BaseTest):
     @pytest.mark.parametrize(
-        "csv_file, supporting_template_file, output_file_paths, result_md5hash",
+        "csv_file, image_dir, supporting_template_file, output_file_paths, result_md5hash",
         [
             (
                 "reagent_batch.csv",
+                "image_dir",
                 "supporting_template.md",
                 [
                     "CD106_PE/0000-0003-4379-8967.md",
                     "CD20_AF488/0000-0001-9561-4256.md",
+                    "FOXP3_eF570/0000-0003-4379-8967.md",
+                    "Glutamine_synthetase_CoraLite_Plus_AF488/0000-0003-2088-8310.md",
                     "CD20_AF488/0000-0003-4379-8967.md",
                     "Granzyme_B_Unconjugated/0000-0001-9561-4256.md",
                     "Ki-67_BV510/0000-0001-9561-4256.md",
                 ],
-                "a7406b230dce81408abc583b2db4e1a6",
+                "c3345fe77aa30a9e87ae15238729d561",
             )
         ],
     )
     def test_csv_to_supporting(
         self,
         csv_file,
+        image_dir,
         supporting_template_file,
         output_file_paths,
         result_md5hash,
@@ -270,6 +271,7 @@ class TestCSV2Supporting(BaseTest):
         output_dir = tmp_path
         csv_2_supporting(
             self.data_path / csv_file,
+            self.data_path / image_dir,
             output_dir,
             self.data_path / supporting_template_file,
         )
@@ -416,32 +418,6 @@ class TestVideosValidation(BaseTest):
                     str(self.data_path / json_config),
                     str(self.data_path / zenodo_json),
                 ]
-            )
-            == result
-        )
-
-
-class TestImageResourcesValidation(BaseTest):
-    @pytest.mark.parametrize(
-        "json_config, input_csv, supporting_material_root_dir, result",
-        [
-            ("image_resources.json", "image_resources.csv", "supporting_material", 0),
-            (
-                "image_resources.json",
-                "image_resources_partial.csv",
-                "supporting_material",
-                1,
-            ),
-        ],
-    )
-    def test_validate_image_resources(
-        self, json_config, input_csv, supporting_material_root_dir, result
-    ):
-        assert (
-            validate_image_resources(
-                str(self.data_path / input_csv),
-                str(self.data_path / json_config),
-                str(self.data_path / supporting_material_root_dir),
             )
             == result
         )

@@ -82,8 +82,6 @@ def validate_bib_file_data(publications_bib_filename):
 
 
 def main(argv=None):
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(description="Validate bibtex file content.")
     parser.add_argument(
         "bibfile",

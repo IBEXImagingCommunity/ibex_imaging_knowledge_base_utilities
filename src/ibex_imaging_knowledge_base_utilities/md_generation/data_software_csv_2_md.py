@@ -142,8 +142,6 @@ def data_software_csv_to_md(
 
 
 def main(argv=None):
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         description="Convert knowledge-base datasets and software file information from csv to md and "
         + "combine with the template file."

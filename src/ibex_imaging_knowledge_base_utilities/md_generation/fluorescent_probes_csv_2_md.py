@@ -59,8 +59,6 @@ def fluorescent_probe_csv_to_md(template_file_path, csv_file_path, output_dir):
 
 
 def main(argv=None):
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         description="Convert knowledge-base fluorescent probes file from csv to md and sort according to excitation and emission."  # noqa E501
     )

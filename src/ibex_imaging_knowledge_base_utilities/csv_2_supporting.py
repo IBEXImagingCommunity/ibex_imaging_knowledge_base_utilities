@@ -21,6 +21,7 @@ import numpy as np
 import pathlib
 import argparse
 import sys
+import shutil
 from .argparse_types import file_path_endswith, dir_path
 
 """
@@ -70,9 +71,10 @@ def replace_char_list(input_str, change_chars_list, replacement_char):
     return input_str
 
 
-def create_md_files(
+def create_supporting_material(
     target_conjugate,
     all_df,
+    image_dir,
     template_str,
     publications_dict,
     supporting_material_root_dir,
@@ -135,6 +137,34 @@ def create_md_files(
         configurations_table["Notes"] = configurations_table["Notes"].replace(
             notes2number
         )
+        images_strs_list = []
+        current_tc_dir = replace_char_list(
+            input_str=f"{target_conjugate.iloc[0]}_{target_conjugate.iloc[1]}",
+            change_chars_list=invalid_chars,
+            replacement_char="_",
+        )
+        images_captions = configurations_table[["Image Files", "Captions"]].map(
+            lambda x: [v.strip() for v in x.split(";")]
+        )
+        for image_files, captions in zip(
+            images_captions["Image Files"], images_captions["Captions"]
+        ):
+            for image_file, caption in zip(image_files, captions):
+                if image_file != "NA":
+                    image_file_path = pathlib.PurePath(image_file)
+                    if str(image_file_path.parent) == current_tc_dir:
+                        image_file_name_target = image_file_path.name
+                        if image_dir:
+                            shutil.copy(
+                                image_dir / image_file_name_target,
+                                data_path / image_file_name_target,
+                            )
+                    else:
+                        image_file_name_target = str(".." / image_file_path)
+                    images_strs_list.append(
+                        f"| {caption} |\n|:-------:|\n| ![]({image_file_name_target}) |"
+                    )
+        notes_str += "\n\n".join(images_strs_list)
 
         actual_publications = set(
             [
@@ -170,7 +200,9 @@ def create_md_files(
         configurations_table["Contributor"] = configurations_table["Contributor"].apply(
             lambda x: f"[{x}](https://orcid.org/{x})"
         )
-        configurations_table = configurations_table.drop(["Publications"], axis=1)
+        configurations_table = configurations_table.drop(
+            ["Publications", "Image Files", "Captions", "MD5"], axis=1
+        )
 
         data_dict = {}
         data_dict["configurations_table"] = configurations_table.fillna("").to_markdown(
@@ -197,7 +229,9 @@ def single_orcid(x):
     return num_orcids == 1
 
 
-def csv_2_supporting(csv_file, supporting_material_root_dir, supporting_template_file):
+def csv_2_supporting(
+    csv_file, image_dir, supporting_material_root_dir, supporting_template_file
+):
     orcid_column_names = ["Agree", "Disagree"]
     # Read the dataframe and keep entries that are "NA", don't convert to nan
     df = pd.read_csv(csv_file, dtype=str, keep_default_na=False)
@@ -253,8 +287,13 @@ def csv_2_supporting(csv_file, supporting_material_root_dir, supporting_template
         ["Target Name / Protein Biomarker", "Conjugate"]
     ].drop_duplicates()
     return unique_target_conjugate.apply(
-        lambda x: create_md_files(
-            x, df, template_str, publications_dict, supporting_material_root_dir
+        lambda x: create_supporting_material(
+            x,
+            df,
+            image_dir,
+            template_str,
+            publications_dict,
+            supporting_material_root_dir,
         ),
         axis=1,
     ).explode()  # explode takes series of lists and returns series of entries
@@ -271,12 +310,22 @@ def main(argv=None):
     parser.add_argument(
         "supporting_template_file", type=lambda x: file_path_endswith(x, ".md.in")
     )
-    parser.add_argument("supporting_material_root_dir", type=dir_path)
+    parser.add_argument(
+        "supporting_material_root_dir",
+        type=dir_path,
+        help="Directory for writing supporting material output.",
+    )
+    parser.add_argument(
+        "--image_dir",
+        type=dir_path,
+        help="Optional directory containing the image files referenced in the input csv.",
+    )
     args = parser.parse_args(argv)
 
     try:
         csv_2_supporting(
             args.csv_file,
+            args.image_dir,
             args.supporting_material_root_dir,
             args.supporting_template_file,
         )
