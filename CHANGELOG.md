@@ -21,7 +21,7 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
-## 0.9.0
+## v0.9.0
 
 ### Changed
 * reagent_resources_csv_2_md_url - images, their captions and md5 hash are now listed as part of the reagent_resources.csv and this information is rendered as a new column containing the captions and linking to the image files.
