@@ -21,11 +21,17 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v0.9.2
+
+### Changed
+* validate_reagent_resources - Added validation to ensure that image files and captions listed in the reagent_resources csv are referenced in the corresponding supporting material markdown files.
+
+
 ## v0.9.0
 
 ### Changed
 * reagent_resources_csv_2_md_url - images, their captions and md5 hash are now listed as part of the reagent_resources.csv and this information is rendered as a new column containing the captions and linking to the image files.
-* validate_reagent_resources - Because images, captions and md5 hash are now listed as part of the reagent_resources.csv, the testing code was migrated from the valiate_image_resources script to this script and the image validation script was removed.
+* validate_reagent_resources - Because images, captions and md5 hash are now listed as part of the reagent_resources.csv, the testing code was migrated from the validate_image_resources script to this script and the image validation script was removed.
 * csv_2_supporting - Added the image information into the csv input file for generating supporting material. Now the script both generates the output markdown files for the listed target-conjugate-orcid combinations and copies image files to the appropriate directories.
 
 ### Removed
