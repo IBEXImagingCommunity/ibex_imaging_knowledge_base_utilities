@@ -60,6 +60,21 @@ def validate_reagent_resources(
     shift_index = 2
 
     df = pd.read_csv(csv_file_name, dtype=str, keep_default_na=False)
+    # Check that there are no empty cells. An empty entry should be explicitly marked by "NA". This
+    # ensures that the data provider intentionally marked the cell as empty.
+    empty_cells = df.map(lambda x: x.strip()) == ""
+    problematic_cells = []
+    for c in empty_cells.columns:
+        empty_cell_indexes = empty_cells[c][empty_cells[c]].index
+        if not empty_cell_indexes.empty:
+            problematic_cells.append([c, empty_cell_indexes + shift_index])
+    if problematic_cells:
+        print(
+            f"The following cells are empty, please replace with NA, (column, rows): {problematic_cells}",
+            file=sys.stderr,
+        )
+        return 1
+
     with open(json_config_file_name) as fp:
         configuration_dict = json.load(fp)
 
@@ -108,7 +123,9 @@ def validate_reagent_resources(
         duplicated_indexes = [
             [i + shift_index for i in indexes] for indexes in duplicated_indexes
         ]
-        print(f"The following rows are duplicates: {duplicated_indexes}", sys.stderr)
+        print(
+            f"The following rows are duplicates: {duplicated_indexes}", file=sys.stderr
+        )
         return 1
 
     # Check that the Contributor ORCID appears in the Agree or Disagree column.
@@ -172,15 +189,19 @@ def validate_reagent_resources(
 
     # Check that the information in the supporting material files is consistent with the content of
     # the reagent_resources.csv.
+
+    # Split the semicolon separated strings into lists
+    df[["Image Files", "Captions", "MD5"]] = df[["Image Files", "Captions", "MD5"]].map(
+        lambda x: [] if x.strip() == "NA" else [v.strip() for v in x.split(";")]
+    )
+
     unique_target_conjugate = df[
         ["Target Name / Protein Biomarker", "Conjugate"]
     ].drop_duplicates()
 
     res = unique_target_conjugate.apply(
         lambda target_conjugate: validate_supporting_material(
-            target_conjugate,
-            df.drop(["Image Files", "Captions", "MD5"], axis=1),
-            supporting_material_root_dir,
+            target_conjugate, df, supporting_material_root_dir, shift_index
         ),
         axis=1,
     )
@@ -200,7 +221,7 @@ def validate_reagent_resources(
     )
     if superfluous_md_files:
         print(
-            "The following files are superfluous to those expected from the "
+            "The following md files are superfluous to those expected from the "
             + f"reagent_resources.csv: {superfluous_md_files}",
             file=sys.stderr,
         )
@@ -226,11 +247,8 @@ def replace_char_list(input_str, change_chars_list, replacement_char):
 
 
 def validate_images(df, supporting_material_root_dir, shift_index):
-    df = df.map(
-        lambda x: [] if x.strip() == "NA" else [v.strip() for v in x.split(";")]
-    )
     supporting_material_root_dir_abspath = os.path.abspath(supporting_material_root_dir)
-    df["Image Files"] = df["Image Files"].apply(
+    image_file_abspaths = df["Image Files"].apply(
         lambda x: [os.path.join(supporting_material_root_dir_abspath, v) for v in x]
     )
     # check that number of files, captions and md5 hashes is equal per configuration/line
@@ -253,7 +271,7 @@ def validate_images(df, supporting_material_root_dir, shift_index):
     missing_file_row_indexes_name = []
     md5_mismatch_file_row_indexes_name = []
     for i, (file_list, md5_list) in enumerate(
-        zip(df["Image Files"], df["MD5"]), start=shift_index
+        zip(image_file_abspaths, df["MD5"]), start=shift_index
     ):
         for f, md5 in zip(file_list, md5_list):
             if not os.path.isfile(f):
@@ -262,12 +280,12 @@ def validate_images(df, supporting_material_root_dir, shift_index):
                 md5_mismatch_file_row_indexes_name.append((i, f))
     if missing_file_row_indexes_name:
         print(
-            f"The following files do not exist (row_number, file_name): {missing_file_row_indexes_name}",
+            f"The following image files do not exist (row_number, file_name): {missing_file_row_indexes_name}",
             file=sys.stderr,
         )
     if md5_mismatch_file_row_indexes_name:
         print(
-            "The following files do not match the md5 hash "
+            "The following image files do not match the listed md5 hash "
             + f"(row_number, file_name): {md5_mismatch_file_row_indexes_name}",
             file=sys.stderr,
         )
@@ -295,7 +313,7 @@ def validate_images(df, supporting_material_root_dir, shift_index):
         image_file_paths_from_supporting_material_dir
     )
     all_csv_image_files = []
-    for image_file_list in df["Image Files"]:
+    for image_file_list in image_file_abspaths:
         all_csv_image_files.extend(image_file_list)
     image_file_paths_from_csv = set(all_csv_image_files)
     superfluous_image_files = image_file_paths_from_supporting_material_dir.difference(
@@ -312,7 +330,7 @@ def validate_images(df, supporting_material_root_dir, shift_index):
 
 
 def validate_supporting_material(
-    target_conjugate, all_df, supporting_material_root_dir
+    target_conjugate, all_df, supporting_material_root_dir, shift_index
 ):
     """
     Given a specific pair of target-conjugate and the complete reagent resources dataframe, go
@@ -360,6 +378,16 @@ def validate_supporting_material(
             replacement_char="_",
         )
     )
+    # Get all the image file names, their captions and line index in which they appear.
+    # An image is required to appear in one or more of the supporting material files
+    # associated with the ORCIDs for this target_conjugate combination
+    image_file_name_caption_index = []
+    for image_fnames, image_captions, i in zip(
+        tc_rows["Image Files"], tc_rows["Captions"], tc_rows.index
+    ):
+        image_file_name_caption_index.extend(
+            list(zip(image_fnames, image_captions, [i] * len(image_fnames)))
+        )
 
     file_names = []
     for orcid in orcids:
@@ -382,11 +410,22 @@ def validate_supporting_material(
             lambda x: frozenset(x)
         )
         try:
-            # read file content remove all rows that are only whitespace and
-            # remove leading or trailing whitespace from all other rows
+            # read file content
             with open(md_file_path, "r", encoding="utf-8") as f:
-                content = f.read().split("\n")
-            content = [c.strip() for c in content if c.strip()]
+                content = f.read()
+            # Check that images and captions specified in the reagent_resources csv
+            # are used in the supporting material files, remove those that are used
+            # for this ORCID. At the end of the process we expect the final list to
+            # be empty.
+            image_file_name_caption_index = [
+                [image_fname, image_caption, i]
+                for image_fname, image_caption, i in image_file_name_caption_index
+                if (pathlib.Path(image_fname).name not in content)
+                or (image_caption not in content)
+            ]
+            # remove all rows that are only whitespace and
+            # remove leading or trailing whitespace from all other rows
+            content = [c.strip() for c in content.split("\n") if c.strip()]
             # Get configurations table, this needs to match the information in the csv file
             config_start_section = content.index("# Configurations") + 1
             config_end_section = content.index("# Publications")
@@ -434,6 +473,13 @@ def validate_supporting_material(
             # Compare the configuration data from the supporting material to that from the reagent_resources file.
             # We don't use DataFrame.equal because that assumes the order of the columns and indexes is the same,
             # which is a harder constraint than needed.
+
+            # Drop the columns that are not part of the table in the markdown file from the csv based dataframe.
+            orcid_configurations = orcid_configurations.drop(
+                ["Image Files", "Captions", "MD5"], axis=1
+            )
+            # The two dataframes are equivalent if they have the same length and contain the same rows, irrespective
+            # of the row order
             if (len(supporting_orcid_configurations) != len(orcid_configurations)) or (
                 len(
                     pd.concat(
@@ -450,6 +496,16 @@ def validate_supporting_material(
         except Exception as e:
             print(f"file:{md_file_path}, exception: {e}", file=sys.stderr)
             status = 1
+    if image_file_name_caption_index:
+        status = 1
+        for image_fname, image_caption, i in image_file_name_caption_index:
+            print(
+                f"Image information, caption ({image_caption}) or filename ({image_fname}), "
+                + "listed in the reagent_resources.csv line "
+                + f"({i+shift_index}) is not used in supporting material file ({md_file_path}).",
+                file=sys.stderr,
+            )
+
     return (file_names, status)
 
 
