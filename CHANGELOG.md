@@ -21,6 +21,11 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v0.9.4
+
+### Changed
+* csv_2_supporting - Additional functionality provided by updated script includes removal of preceding and trailing whitespace from the input csv file and computing the MD5 hashes for provided images. The original input csv is updated and overwritten.
+
 ## v0.9.2
 
 ### Changed
