@@ -24,7 +24,7 @@ from ibex_imaging_knowledge_base_utilities.argparse_types import (
     csv_path,
     file_path_endswith,
 )
-from .utilities import validate_df
+from .validation_utilities import validate_df
 
 """
 This script validates the contents of a csv file using the settings specified in
