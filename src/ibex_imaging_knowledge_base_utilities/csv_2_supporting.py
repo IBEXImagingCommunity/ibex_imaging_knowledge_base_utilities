@@ -17,12 +17,12 @@
 # =========================================================================
 
 import pandas as pd
-import numpy as np
 import pathlib
 import argparse
 import sys
 import shutil
-from .argparse_types import file_path_endswith, dir_path
+from .argparse_types import file_path_endswith, dir_path, csv_path
+from .utilities import md5sum
 
 """
 This utility script facilitates batch creation of supporting material files from a comma-separated-value
@@ -232,35 +232,55 @@ def single_orcid(x):
 def csv_2_supporting(
     csv_file, image_dir, supporting_material_root_dir, supporting_template_file
 ):
-    orcid_column_names = ["Agree", "Disagree"]
     # Read the dataframe and keep entries that are "NA", don't convert to nan
     df = pd.read_csv(csv_file, dtype=str, keep_default_na=False)
 
+    # Remove preceding and trailing whitespaces in single and multi-entry columns
+    df = df.map(lambda x: x.strip(), na_action="ignore")
+    df["Image Files"] = df["Image Files"].map(
+        lambda x: (
+            "NA"
+            if x.strip() == "NA"
+            else ";".join([v.strip() for v in x.split(";") if v.strip()])
+        )
+    )
+    df["Captions"] = df["Captions"].map(
+        lambda x: (
+            "NA"
+            if x.strip() == "NA"
+            else ";".join([v.strip() for v in x.split(";") if v.strip()])
+        )
+    )
+
     # Check that there is only one ORCID per row.
-    single_orcid_rows = df[orcid_column_names].apply(single_orcid, axis=1)
+    single_orcid_rows = df[["Agree", "Disagree"]].apply(single_orcid, axis=1)
     if not single_orcid_rows.all():
         raise ValueError(
             f"Invalid file {csv_file}, following rows contain more than one ORCID:\n{list(single_orcid_rows[single_orcid_rows==False].index)}"  # noqa E501
         )
 
-    # Check that dataframe does not contain preceding or trailing whitespace in entries
-    df_stripped_whitespace = df.map(lambda x: x.strip(), na_action="ignore")
-    diff_entries = np.where(
-        (df != df_stripped_whitespace)
-        & ~(df.isnull() & df_stripped_whitespace.isnull())
+    # Check that the number of image files and captions matches
+    # and create the md5 entries if the image_dir parameter is given
+    files_captions = df[["Image Files", "Captions"]].map(
+        lambda x: (
+            [] if x.strip() == "NA" else [v.strip() for v in x.split(";") if v.strip()]
+        )
     )
-    if diff_entries[0].size > 0:
+    files_captions_mismatch = files_captions.apply(
+        lambda x: len(x.iloc[0]) != len(x.iloc[1]), axis=1
+    )
+    problem_indexes = files_captions_mismatch[files_captions_mismatch].index
+    if not problem_indexes.empty:
         raise ValueError(
-            "Dataframe entries contain preceding or trailing whitespace, please remove [row, col, value]:\n"
-            + "\n".join(
-                [
-                    f"{row+2},{col+1}: {val}"
-                    for row, col, val in zip(
-                        diff_entries[0], diff_entries[1], df.values[diff_entries]
-                    )
-                ]
+            f"Number of image files does not match number of captions for rows: {problem_indexes+2}"
+        )
+    if image_dir:
+        df["MD5"] = files_captions["Image Files"].apply(
+            lambda x: ";".join(
+                [md5sum(f"{image_dir}/{pathlib.Path(fname).name}") for fname in x]
             )
         )
+
     with open(supporting_template_file) as fp:
         template_str = fp.read()
     # Get the publications strings
@@ -286,7 +306,7 @@ def csv_2_supporting(
     unique_target_conjugate = df[
         ["Target Name / Protein Biomarker", "Conjugate"]
     ].drop_duplicates()
-    return unique_target_conjugate.apply(
+    unique_target_conjugate.apply(
         lambda x: create_supporting_material(
             x,
             df,
@@ -296,7 +316,9 @@ def csv_2_supporting(
             supporting_material_root_dir,
         ),
         axis=1,
-    ).explode()  # explode takes series of lists and returns series of entries
+    )
+    # overwrite the original csv with the updated one (removed preceding/trailing whitespace and added MD5 hashes)
+    df.to_csv(csv_file, index=False)
 
 
 def main(argv=None):
@@ -306,7 +328,39 @@ def main(argv=None):
         description="Create supporting material files from a csv which has the same structure as the "
         + 'reagent_resources.csv and two additional columns "Publications" and "Notes".'
     )
-    parser.add_argument("csv_file", type=lambda x: file_path_endswith(x, ".csv"))
+    parser.add_argument(
+        "csv_file",
+        type=lambda x: csv_path(
+            x,
+            required_columns={
+                "UniProt Accession Number",
+                "Reagent Type",
+                "Target Name / Protein Biomarker",
+                "Target Species",
+                "Host Organism",
+                "Isotype",
+                "Clonality",
+                "Vendor",
+                "Catalog Number",
+                "Conjugate",
+                "RRID",
+                "Availability",
+                "Method",
+                "Tissue Preservation",
+                "Target Tissue",
+                "Tissue State",
+                "Detergent",
+                "Antigen Retrieval Conditions",
+                "Dye Inactivation Conditions",
+                "Recommend",
+                "Agree",
+                "Disagree",
+                "Contributor",
+                "Publications",
+                "Notes",
+            },
+        ),
+    )
     parser.add_argument(
         "supporting_template_file", type=lambda x: file_path_endswith(x, ".md.in")
     )
