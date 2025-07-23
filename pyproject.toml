@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ibex_imaging_knowledge_base_utilities"
-version = "0.9.2"
+version = "0.9.4"
 authors = [{ name="Ziv Yaniv", email="zivyaniv@nih.gov" },
 ]
 description = "Utility scripts used for managing the IBEX Imaging Community Knowledge-Base"
@@ -17,12 +17,9 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-dependencies = [
-    "pandas",
-    "tabulate",
-    "bibtexparser",
-    "requests"
-]
+dynamic = ["dependencies"]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 
 [project.urls]
 "Bug Tracker" = "https://github.com/IBEXImagingCommunity/ibex_imaging_knowledge_base_utilities/issues"
