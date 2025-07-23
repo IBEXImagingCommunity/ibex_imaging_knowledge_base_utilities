@@ -21,7 +21,7 @@ import json
 import argparse
 import pandas as pd
 from ibex_imaging_knowledge_base_utilities.argparse_types import file_path_endswith
-from .utilities import validate_df
+from .validation_utilities import validate_df
 
 """
 This script validates the contents of the videos.csv file. Do basic validation and ensure that

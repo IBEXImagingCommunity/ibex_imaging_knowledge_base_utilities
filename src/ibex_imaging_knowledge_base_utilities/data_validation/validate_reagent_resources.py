@@ -28,7 +28,8 @@ from ibex_imaging_knowledge_base_utilities.argparse_types import (
     dir_path,
     csv_path,
 )
-from .utilities import validate_df, md5sum
+from .validation_utilities import validate_df
+from ibex_imaging_knowledge_base_utilities.utilities import md5sum
 
 """
 This script validates the contents of the reagents_resources.csv file:
