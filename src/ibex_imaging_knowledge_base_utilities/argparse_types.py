@@ -44,15 +44,15 @@ def csv_path(path, required_columns={}):
     required_columns = set(required_columns)
     if p.is_file():
         try:  # only read the csv header
-            expected_columns_exist = required_columns.issubset(
+            missing_columns = required_columns.difference(
                 set(pd.read_csv(path, nrows=0).columns.tolist())
             )
-            if expected_columns_exist:
-                return p
-            else:
+            if missing_columns:
                 raise argparse.ArgumentTypeError(
-                    f"Invalid argument ({path}), does not contain all expected columns."
+                    f"Invalid argument ({path}), csv file does not contain all expected columns. "
+                    + f"Missing columns ({missing_columns})."
                 )
+            return p
         except UnicodeDecodeError:
             raise argparse.ArgumentTypeError(
                 f"Invalid argument ({path}), not a csv file."
