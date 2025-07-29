@@ -13,36 +13,14 @@ accompanying [website](https://ibeximagingcommunity.github.io/ibex_imaging_knowl
 
 ### Validating the KB information
 
-On the commandline, go to the root directory of the KB and run the relevant command for the file(s) you want to validate:
-```
-validate_zenodo_json .zenodo.json
-```
-```
-validate_bibfile data/publications.bib
-```
-```
-validate_basic data/protocols.csv .github/data_validation_configs/protocols.json
-```
-```
-validate_basic data/vendor_urls.csv .github/data_validation_configs/vendors.json
-```
-```
-validate_basic data/datasets.csv .github/data_validation_configs/datasets.json
-```
-```
-validate_basic data/software.csv .github/data_validation_configs/software.json
-```
-```
-validate_basic data/fluorescent_probes.csv .github/data_validation_configs/fluorescent_probes.json
-```
-```
-validate_videos data/videos.csv .github/data_validation_configs/videos.json .zenodo.json
-```
-```
-validate_reagent_resources data/reagent_resources.csv .github/data_validation_configs/reagent_resources.json .zenodo.json data/vendor_urls.csv docs/supporting_material
-```
+On the commandline, go to the root directory of the KB and run the relevant command for the file(s) you want to validate. For the current way to run the validation scripts, see their usage in the GitHub [actions workflow](https://github.com/IBEXImagingCommunity/ibex_imaging_knowledge_base/blob/26fc5ccc4a4bb36239cc7b9e311a6cd8211e5d1c/.github/workflows/main.yml#L84-L92). These are the commands that are automatically run when data is added to the KB repository.
 
-These validations are automatically performed when data is added to the KB repository (see the KB [GitHub workflow](https://github.com/IBEXImagingCommunity/ibex_imaging_knowledge_base/blob/main/.github/workflows/main.yml) for details).
+### Converting the KB information to markdown
+
+On the commandline, go to the root directory of the KB and run the relevant command for the file(s) you want to convert. Note that the conversion of the publications bibliography file to markdown assumes that the [pandoc program](https://pandoc.org/) is installed (a general document conversion program supporting many common formats such as LaTex, docx).
+
+For the current way to run the conversion scripts, see their usage in the GitHub [actions workflow](https://github.com/IBEXImagingCommunity/ibex_imaging_knowledge_base/blob/26fc5ccc4a4bb36239cc7b9e311a6cd8211e5d1c/.github/workflows/main.yml#L173-L209).
+
 
 ### Creating supporting material
 
