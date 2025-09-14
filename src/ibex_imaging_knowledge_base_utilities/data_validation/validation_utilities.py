@@ -22,68 +22,175 @@ import numpy as np
 from concurrent.futures import ThreadPoolExecutor
 import sys
 import pandas as pd
+import random
+from urllib.parse import urlparse
+from collections import defaultdict
 
 
 def url_exists(
     url,
+    session,
     request_timeout=2,
     allow_redirects=True,
-    request_headers={
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36"  # noqa E501
-    },
+    delay_between_tries=[0.1, 0.3],
     **kwargs,
 ):
-    """
-    Check if a url exists. All parameters supported by requests.head are available. Those not explicitly
-    listed are forwarded as is to requests.head. Timeout exceptions are considered a success. Also,
-    the 403 "forbidden" code (server understands the request but refuses to authorize it) is considered
-    success too.
-    """
     try:
-        # Using requests.head and not requests.get because
-        # we don't need the webpage content.
-        res = requests.head(
+        # Using head and not get because
+        # we don't need the webpage content so more eco friendly.
+        res = session.head(
             url,
             timeout=request_timeout,
-            headers=request_headers,
             allow_redirects=allow_redirects,
             **kwargs,
         )
+        # head resulted in a 405 Method Not Allowed, try get after a short delay
+        if res.status_code == 405:
+            time.sleep(random.uniform(delay_between_tries[0], delay_between_tries[1]))
+            res = session.get(
+                url,
+                timeout=request_timeout,
+                allow_redirects=allow_redirects,
+                stream=True,  # don't download full content
+                **kwargs,
+            )
+            res.close()  # close the connection immediately
         if res.status_code == 403:
             print(f"{url}: 403 forbidden code, server refused to authorize request")
-        # HTTP 200 status code for success
-        return res.status_code in [200, 403]
+        # HTTP 200 status code for success, 30x redirects and 403 forbidden. We consider
+        # all these responses as indicating that the URL exists.
+        return res.status_code in [200, 301, 302, 303, 307, 308, 403]
     except requests.exceptions.Timeout:
         print(f"{url}: timed out ({request_timeout}sec)")
+        return True
+    except requests.exceptions.SSLError:
+        print(f"{url}: SSL error, but URL likely exists")
         return True
     except requests.exceptions.RequestException as e:
         print(f"{url}: {e}")
         return False
 
 
-def url_exists_with_retries(
-    url,
+def urls_exist_with_retries(
+    urls,
     retry_num=0,
+    delay_between_tries=[0.1, 0.3],
     request_timeout=2,
     allow_redirects=True,
-    request_headers={
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36"  # noqa E501
-    },
+    request_headers=None,
     **kwargs,
 ):
-    if url_exists(url, request_timeout, allow_redirects, request_headers, **kwargs):
-        return True
-    # Retry using exponential backoff + some randomness so that we don't get a bunch of
-    # threads or processes all performing queries in a synchronized fashion.
-    # We could have used the Retry built in strategy
-    # (https://requests.readthedocs.io/en/latest/user/advanced/#example-automatic-retries,
-    # https://www.zenrows.com/blog/python-requests-retry#best-methods-to-retry)
-    # but it isn't more succinct or efficient than what is implemented here.
-    for i in range(retry_num):
-        time.sleep(pow(base=2, exp=i) + np.random.random())
-        if url_exists(url, request_timeout, allow_redirects, request_headers, **kwargs):
-            return True
-    return False
+    """
+    Check if a set of urls exist. All parameters supported by requests.head are available. Those not explicitly
+    listed are forwarded as is to requests.head. Timeout exceptions are considered a success. Also,
+    the 403 "forbidden" code (server understands the request but refuses to authorize it) is considered
+    success too.
+    """
+    # Use various user agents to reduce chances of blocking, 403 response.
+    user_agents = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",  # noqa: E501
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",  # noqa: E501
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0",
+        "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15",  # noqa: E501
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",  # noqa: E501
+    ]
+
+    if request_headers is None:
+        # Create comprehensive browser-like headers to avoid 403 errors
+        selected_user_agent = random.choice(user_agents)
+
+        # Determine browser type from user agent for consistent headers
+        is_chrome = "Chrome" in selected_user_agent and "Edg" not in selected_user_agent
+        is_firefox = "Firefox" in selected_user_agent
+        is_safari = (
+            "Safari" in selected_user_agent and "Chrome" not in selected_user_agent
+        )
+        is_edge = "Edg" in selected_user_agent
+
+        # Base headers that work for most sites
+        request_headers = {
+            "User-Agent": selected_user_agent,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",  # noqa: E501
+            "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "DNT": "1",
+            "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
+            "Cache-Control": "max-age=0",
+        }
+
+        # Browser-specific headers for maximum authenticity
+        if is_chrome or is_edge:
+            request_headers.update(
+                {
+                    "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+                    "sec-ch-ua-mobile": "?0",
+                    "sec-ch-ua-platform": (
+                        '"Windows"'
+                        if "Windows" in selected_user_agent
+                        else '"macOS"' if "Mac" in selected_user_agent else '"Linux"'
+                    ),
+                }
+            )
+        elif is_firefox:
+            # Firefox doesn't send sec-ch-ua headers
+            pass
+        elif is_safari:
+            # Safari has different sec headers
+            request_headers.update(
+                {
+                    "Sec-Fetch-Site": "same-origin",
+                }
+            )
+    results = []
+    with requests.Session() as session:
+        session.headers.update(request_headers)
+        for url in urls:
+            if url_exists(
+                url,
+                session,
+                request_timeout=request_timeout,
+                allow_redirects=allow_redirects,
+                **kwargs,
+            ):
+                results.append(True)
+            else:
+                # Retry using exponential backoff + some randomness so that we don't get a bunch of
+                # threads or processes all performing queries in a synchronized fashion.
+                # We could have used the Retry built in strategy
+                # (https://requests.readthedocs.io/en/latest/user/advanced/#example-automatic-retries,
+                # https://www.zenrows.com/blog/python-requests-retry#best-methods-to-retry)
+                # but it isn't more succinct or efficient than what is implemented here.
+                i = 0
+                not_successful = True
+                while i < retry_num and not_successful:
+                    time.sleep(pow(base=2, exp=i) + np.random.random())
+                    if url_exists(
+                        url,
+                        session,
+                        request_timeout=request_timeout,
+                        allow_redirects=allow_redirects,
+                        **kwargs,
+                    ):
+                        results.append(True)
+                        not_successful = False
+                    i += 1
+                if not_successful:
+                    results.append(False)
+
+            # Add small delay between requests, especially for same domain
+            if len(urls) > 1:
+                time.sleep(
+                    random.uniform(delay_between_tries[0], delay_between_tries[1])
+                )
+    return results
 
 
 def check_urls(
@@ -92,30 +199,56 @@ def check_urls(
     retry_num=0,
     request_timeout=10,
     allow_redirects=True,
-    request_headers={
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36"  # noqa E501
-    },
+    request_headers=None,
     **kwargs,
 ):
     """
-    Check url existence for a number of urls in a container. It is assumed that the urls
-    are for different hosts (if they are on the same host then better to use a
-    requests.Session object).
+    Check url existence for the urls given in the container.
+
+    This is a multi-threaded approach where each thread uses its own requests.Session
+    object. URLs are grouped by domain and each group is checked using an independent
+    thread and session so that multiple threads don't try to connect to the same host concurrently.
+    This is a best effort in terms of mimicking browser requests to avoid 403 errors, though these
+    are considered as successful. Unfortunately, this still does not pass the scrutiny of some
+    sites (possibly protected for Denial Of Service attacks) and they
+    return a 403 error. Timeout exceptions are also considered a success.
+    Finally, some sites return a 404 error even when they exist (https://www.sysy.com/). This
+    may be a server error or intentional when the site identifies that it is being queried by
+    a script/bot.
+
+    Returns a list of boolean values indicating for each url in the container if it exists
+    or not.
     """
+
+    results_dict = {}
+    # Split the urls by domain to avoid multiple threads concurrently trying to
+    # connect to the same host. Each thread will use its own requests.Session.
+    domain_groups = defaultdict(list)
+    for url in urls_container:
+        try:
+            domain = urlparse(url).netloc
+            domain_groups[domain].append(url)
+        except Exception:
+            # If URL parsing fails, then the URL is incorrect
+            results_dict[url] = False
+
     with ThreadPoolExecutor(num_threads) as executor:
-        return list(
-            executor.map(
-                lambda x: url_exists_with_retries(
-                    url=x,
-                    retry_num=retry_num,
-                    request_timeout=request_timeout,
-                    allow_redirects=allow_redirects,
-                    request_headers=request_headers,
-                    **kwargs,
-                ),
-                urls_container,
-            )
+        dict_values = domain_groups.values()
+        res = executor.map(
+            lambda x: urls_exist_with_retries(
+                urls=x,
+                retry_num=retry_num,
+                request_timeout=request_timeout,
+                allow_redirects=allow_redirects,
+                request_headers=request_headers,
+                **kwargs,
+            ),
+            dict_values,
         )
+        for url_list, result_list in zip(dict_values, res):
+            for url, result in zip(url_list, result_list):
+                results_dict[url] = result
+    return [results_dict[url] for url in urls_container]
 
 
 def duplicated_entries_single_value_columns(df, column_names):

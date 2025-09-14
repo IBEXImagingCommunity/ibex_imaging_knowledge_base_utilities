@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ibex_imaging_knowledge_base_utilities"
-version = "0.9.4"
+version = "0.9.6"
 authors = [{ name="Ziv Yaniv", email="zivyaniv@nih.gov" },
 ]
 description = "Utility scripts used for managing the IBEX Imaging Community Knowledge-Base"
