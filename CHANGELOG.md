@@ -21,6 +21,12 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v0.9.6
+
+### Changed
+
+validation_utilities - Improvements to the URL checking code. Increase the chances of not getting a 403 (forbidden, server refused to authorize request) by mimicking a browser. This doesn't solve the issue when sites really don't want to be scanned by scripts/bots, just improves the chances.
+
 ## v0.9.4
 
 ### Changed
