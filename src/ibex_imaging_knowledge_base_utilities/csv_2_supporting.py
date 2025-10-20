@@ -29,23 +29,23 @@ This utility script facilitates batch creation of supporting material files from
 file. The csv file follows the format of the knowledge-base reagent_resources.csv, with the following differences:
 1. Each row is expected to contain a single ORCID, either in the Agree or Disagree column. # noqa W291
 2. Two additional columns, "Publications" and "Notes". The "Notes" column is free text and can include markdown formatting.
-The "Publications" column contains the prefixes of markdown files that contain the publication information. If multiple 
+The "Publications" column contains the prefixes of markdown files that contain the publication information. If multiple
 publications are associated with the same row, they are separated by a semicolon. These files are expected to be in the
 same directory as the csv input file.
 
 Example entry for "Publications" column:"radtke_pnas;radtke_nat_prot", corresponding markdown files are
 radtke_pnas.md and radtke_nat_prot.md.
 
-All supporting materials files follow the same structure which is defined by a template file. Generally speaking, 
+All supporting materials files follow the same structure which is defined by a template file. Generally speaking,
 template based file generation is best done using a dedicated tool such as jinja (https://jinja.palletsprojects.com/).
-As our use case is very simple, string formatting is sufficient and we avoid dependency on an additional tool. 
+As our use case is very simple, string formatting is sufficient and we avoid dependency on an additional tool.
 
 The supporting material files are created with the expected names in the specific directory: target_conjugate/orcid.md.
 
 NOTE: This script is intended for initial creation of supporting material files. If the file target_conjugate/orcid.md
 already exists, DO NOT use the same directory for output. Instead, provide a temporary directory for output. You
 then need to reconcile the newly created file(s) with the existing one(s). The numbering of the publications
-and notes need to be updated when the new file content is added to the existing content and the configuration 
+and notes need to be updated when the new file content is added to the existing content and the configuration
 table needs to be updated too. This is a MANUAL step.
 """
 
