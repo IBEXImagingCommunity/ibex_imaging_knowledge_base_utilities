@@ -322,8 +322,6 @@ def csv_2_supporting(
 
 
 def main(argv=None):
-    if argv is None:  # script was invoked from commandline
-        argv = sys.argv[1:]
     parser = argparse.ArgumentParser(
         description="Create supporting material files from a csv which has the same structure as the "
         + 'reagent_resources.csv and two additional columns "Publications" and "Notes".'
