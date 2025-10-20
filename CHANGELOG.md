@@ -12,14 +12,18 @@ Each release should describe the changes using the following subsection types:
   * *Removed* - removed features.
   * *Fixed* - bug fixes.
 
-When working on the package, add information under the "Unreleased" heading. In this manner the release notes are
-created incrementally, and do not require a concerted effort prior to a release.
+When working on the package, add information under the "Unreleased" heading. In this manner the release notes are created incrementally, and do not require a concerted effort prior to a release.
 
-Using a manual approach to create the release notes instead of automatically deriving them from the
-commits allows us to provide a high level description of the features and issues, yet provide details when those are
+Using a manual approach to create the release notes instead of automatically deriving them from the commits allows us to provide a high level description of the features and issues, yet provide details when those are
 needed. This is equivalent to summarizing all activity on a feature branch versus reporting all commits on that branch.
 
 ## Unreleased
+
+## v0.9.8
+
+### Added
+
+create_draft_release_notes - Utility script for creating draft release notes for a Knowledge-Base release. Automatically counting number of new and removed reagent validations, videos, software, datasets etc. In addition, all new contributors are explicitly listed. This is used by a GitHub actions workflow that runs the script when a tag is pushed to the KB repository, simplifying the task of creating release notes.
 
 ## v0.9.6
 

@@ -8,12 +8,14 @@ fail_fast: true
 
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.3.0
+  rev: v6.0.0
   hooks: # check for large files, in our case images, should commit with git-lfs
    - id: check-added-large-files
      args: ['--maxkb=200']
    - id: check-json
    - id: check-yaml
+   - id: trailing-whitespace
+     files: \.py$
 - repo: https://github.com/psf/black
   rev: 24.4.2
   hooks: # check conformance to black formatting

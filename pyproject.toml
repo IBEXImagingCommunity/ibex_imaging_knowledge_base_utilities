@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ibex_imaging_knowledge_base_utilities"
-version = "0.9.6"
+version = "0.9.8"
 authors = [{ name="Ziv Yaniv", email="zivyaniv@nih.gov" },
 ]
 description = "Utility scripts used for managing the IBEX Imaging Community Knowledge-Base"
@@ -34,9 +34,10 @@ zenodo_json_2_thewho_md = "ibex_imaging_knowledge_base_utilities.md_generation.z
 protocols_csv_2_md = "ibex_imaging_knowledge_base_utilities.md_generation.protocols_csv_2_md:main"
 videos_csv_2_md = "ibex_imaging_knowledge_base_utilities.md_generation.videos_csv_2_md:main"
 data_software_csv_2_md = "ibex_imaging_knowledge_base_utilities.md_generation.data_software_csv_2_md:main"
-csv2supporting = "ibex_imaging_knowledge_base_utilities.csv_2_supporting:main"
 validate_zenodo_json = "ibex_imaging_knowledge_base_utilities.data_validation.validate_zenodo_json:main"
 validate_bibfile = "ibex_imaging_knowledge_base_utilities.data_validation.validate_bib:main"
 validate_basic = "ibex_imaging_knowledge_base_utilities.data_validation.validate_basic:main"
 validate_videos = "ibex_imaging_knowledge_base_utilities.data_validation.validate_videos:main"
 validate_reagent_resources = "ibex_imaging_knowledge_base_utilities.data_validation.validate_reagent_resources:main"
+csv2supporting = "ibex_imaging_knowledge_base_utilities.csv_2_supporting:main"
+create_draft_release_notes = "ibex_imaging_knowledge_base_utilities.create_draft_release_notes:main"
