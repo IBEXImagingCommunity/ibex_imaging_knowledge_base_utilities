@@ -79,7 +79,7 @@ def validate_zenodo_json(zenodo_json):
         )
         return 1
     for key in json_key_types.keys():
-        if type(zenodo_dict[key]) != json_key_types[key]:
+        if type(zenodo_dict[key]) is not json_key_types[key]:
             print(
                 f"Unexpected entry type for key ({key}). Expected {json_key_types[key]}, got ({type(zenodo_dict[key])}).",  # noqa E501
                 file=sys.stderr,

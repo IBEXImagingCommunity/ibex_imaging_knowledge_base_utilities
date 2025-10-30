@@ -17,12 +17,12 @@ repos:
    - id: trailing-whitespace
      files: \.py$
 - repo: https://github.com/psf/black
-  rev: 24.4.2
+  rev: 25.9.0
   hooks: # check conformance to black formatting
    - id: black 
      args: ['--check'] # if run without arguments, will fail and will format the files
-- repo: https://github.com/pycqa/flake8
-  rev: 5.0.4
+- repo: https://github.com/PyCQA/flake8
+  rev: 7.3.0
   hooks: # check conformance to PEP8, flake8 formatting
    - id: flake8 
 
