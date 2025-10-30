@@ -1,6 +1,18 @@
-name: ibex_knowledge_base_utilities
+name: ibex_knowledge_base_utilities_dev
 
 channels:
   - defaults
 dependencies:
-  - python=3.10.0 
+  - python=3.10
+  - pip
+  - pip:
+    - pandas
+    - tabulate
+    - bibtexparser
+    - requests
+    - pytest
+    - black
+    - flake8
+    - pre-commit
+    - build
+
