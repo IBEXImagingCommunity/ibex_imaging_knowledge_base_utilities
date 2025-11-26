@@ -67,6 +67,11 @@ def create_release_notes(
             fp.write(release_notes_header)
             fp.write("".join(release_notes))
             return 0
+    print(
+        f"No release notes found for the given release ({release_tag})."
+        + " Either the tag was not in the CHANGELOG.md file or there were no notes for the tag.",
+        file=sys.stderr,
+    )
     return 1
 
 
