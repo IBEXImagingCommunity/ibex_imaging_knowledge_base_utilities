@@ -19,17 +19,21 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+### Changed
+* Move to usage of [mini-forge](https://github.com/conda-forge/miniforge) and conda-forge as default channel, permissive license (BSD-3-Clause).
+
+### Fixed
+* Add missing newlines in the `csv_2_supporting` script so that markdown with the notes section followed by images is rendered correctly.
+
 ## v0.9.8
 
 ### Added
-
-create_draft_release_notes - Utility script for creating draft release notes for a Knowledge-Base release. Automatically counting number of new and removed reagent validations, videos, software, datasets etc. In addition, all new contributors are explicitly listed. This is used by a GitHub actions workflow that runs the script when a tag is pushed to the KB repository, simplifying the task of creating release notes.
+* create_draft_release_notes - Utility script for creating draft release notes for a Knowledge-Base release. Automatically counting number of new and removed reagent validations, videos, software, datasets etc. In addition, all new contributors are explicitly listed. This is used by a GitHub actions workflow that runs the script when a tag is pushed to the KB repository, simplifying the task of creating release notes.
 
 ## v0.9.6
 
 ### Changed
-
-validation_utilities - Improvements to the URL checking code. Increase the chances of not getting a 403 (forbidden, server refused to authorize request) by mimicking a browser. This doesn't solve the issue when sites really don't want to be scanned by scripts/bots, just improves the chances.
+* validation_utilities - Improvements to the URL checking code. Increase the chances of not getting a 403 (forbidden, server refused to authorize request) by mimicking a browser. This doesn't solve the issue when sites really don't want to be scanned by scripts/bots, just improves the chances.
 
 ## v0.9.4
 

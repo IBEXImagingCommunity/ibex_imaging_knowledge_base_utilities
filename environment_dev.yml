@@ -1,9 +1,10 @@
 name: ibex_knowledge_base_utilities_dev
 
 channels:
-  - defaults
+  - conda-forge
 dependencies:
-  - python=3.10
+  - python=3.13
+  - pandoc # install the commandline tool (pip installs a Python library that wraps it, not the tool itself)
   - pip
   - pip:
     - pandas
