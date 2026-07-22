@@ -164,6 +164,8 @@ def create_supporting_material(
                     images_strs_list.append(
                         f"| {caption} |\n|:-------:|\n| ![]({image_file_name_target}) |"
                     )
+        if images_strs_list:
+            notes_str += "\n\n"
         notes_str += "\n\n".join(images_strs_list)
 
         actual_publications = set(

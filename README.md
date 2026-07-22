@@ -8,7 +8,7 @@ accompanying [website](https://ibeximagingcommunity.github.io/ibex_imaging_knowl
 
 ### Installation
 
-1. Create a Python virtual environment using [venv](https://docs.python.org/3/library/venv.html) or [conda](https://docs.conda.io/projects/conda/en/stable/).
+1. Create a Python virtual environment using [venv](https://docs.python.org/3/library/venv.html) or [conda/mamba](https://github.com/conda-forge/miniforge).
 2. Follow [these instructions](https://github.com/IBEXImagingCommunity/ibex_imaging_knowledge_base_utilities/releases/latest) to install the latest utilities.
 
 ### Validating the KB information
