@@ -24,6 +24,7 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ### Fixed
 * Add missing newlines in the `csv_2_supporting` script so that markdown with the notes section followed by images is rendered correctly.
+* Improve URL existence check across all scripts. Added HTTP response 429, "Too Many Requests", to the list of status codes which may be returned from the server indicating a URL exists. The 429 error response code means client has sent too many requests in a given amount of time, server is rate-limiting but the URL exists.
 
 ## v0.9.8
 

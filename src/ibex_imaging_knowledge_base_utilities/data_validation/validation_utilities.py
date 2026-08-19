@@ -57,9 +57,11 @@ def url_exists(
             res.close()  # close the connection immediately
         if res.status_code == 403:
             print(f"{url}: 403 forbidden code, server refused to authorize request")
-        # HTTP 200 status code for success, 30x redirects and 403 forbidden. We consider
-        # all these responses as indicating that the URL exists.
-        return res.status_code in [200, 301, 302, 303, 307, 308, 403]
+        if res.status_code == 429:
+            print(f"{url}: 429 too many requests, server is rate-limiting access")
+        # HTTP 200 status code for success, 30x redirects, 403 forbidden, and 429 rate-limited.
+        # We consider all these responses as indicating that the URL exists.
+        return res.status_code in [200, 301, 302, 303, 307, 308, 403, 429]
     except requests.exceptions.Timeout:
         print(f"{url}: timed out ({request_timeout}sec)")
         return True
