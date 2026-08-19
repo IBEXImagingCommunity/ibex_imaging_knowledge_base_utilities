@@ -19,6 +19,8 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v1.0.0
+
 ### Changed
 * Move to usage of [mini-forge](https://github.com/conda-forge/miniforge) and conda-forge as default channel, permissive license (BSD-3-Clause).
 
