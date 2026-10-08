@@ -19,6 +19,10 @@ needed. This is equivalent to summarizing all activity on a feature branch versu
 
 ## Unreleased
 
+## v1.2.1
+
+### Fixed
+Updated URL existence checking code to accommodate for 503 return value, service unavailable (server down for maintenance or overloaded). This return code means the URL exists, just not accessible.
 
 ## v1.2.0
 
